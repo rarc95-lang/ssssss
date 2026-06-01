@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>WFWorkflowActions</key>
+	<array>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.mail.search</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Unread Emails</string>
+				<key>UUID</key>
+				<string>A88ABF89-AA5C-43C6-B6CA-87AFA9C05A6E</string>
+				<key>WFMailSearchFilter</key>
+				<dict>
+					<key>WFMailSearchFilterIsRead</key>
+					<false/>
+				</dict>
+				<key>WFMailSearchMaxEmails</key>
+				<integer>20</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.count</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Email Count</string>
+				<key>Input</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Unread Emails</string>
+						<key>OutputUUID</key>
+						<string>A88ABF89-AA5C-43C6-B6CA-87AFA9C05A6E</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+				<key>UUID</key>
+				<string>4D1D4490-45EE-4DE7-9E4B-72403627CD7B</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.conditional</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>CE52562D-F94F-477B-961F-DD9DC4B65DE8</string>
+				<key>WFCondition</key>
+				<integer>4</integer>
+				<key>WFConditionalActionString</key>
+				<string>0</string>
+				<key>WFControlFlowMode</key>
+				<integer>0</integer>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Email Count</string>
+						<key>OutputUUID</key>
+						<string>4D1D4490-45EE-4DE7-9E4B-72403627CD7B</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.showresult</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>Text</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict/>
+						<key>string</key>
+						<string>✅ Inbox limpio — No hay correos sin leer</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.exit</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.conditional</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>CE52562D-F94F-477B-961F-DD9DC4B65DE8</string>
+				<key>WFControlFlowMode</key>
+				<integer>2</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.repeat.each</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>175A14CB-CFB4-48C7-9881-905C4B4BB3E7</string>
+				<key>UUID</key>
+				<string>EC61805D-B988-43A4-B851-436ECE598805</string>
+				<key>WFControlFlowMode</key>
+				<integer>0</integer>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Unread Emails</string>
+						<key>OutputUUID</key>
+						<string>A88ABF89-AA5C-43C6-B6CA-87AFA9C05A6E</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Email Block</string>
+				<key>UUID</key>
+				<string>461A72CB-1076-4B87-99FE-C872C876BDC3</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{16, 1}</key>
+							<dict>
+								<key>Aggrandizements</key>
+								<array>
+									<dict>
+										<key>PropertyName</key>
+										<string>Subject</string>
+										<key>Type</key>
+										<string>WFPropertyVariableAggrandizement</string>
+									</dict>
+								</array>
+								<key>OutputName</key>
+								<string>Repeat Item</string>
+								<key>OutputUUID</key>
+								<string>EC61805D-B988-43A4-B851-436ECE598805</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+							<key>{29, 1}</key>
+							<dict>
+								<key>Aggrandizements</key>
+								<array>
+									<dict>
+										<key>PropertyName</key>
+										<string>Body</string>
+										<key>Type</key>
+										<string>WFPropertyVariableAggrandizement</string>
+									</dict>
+								</array>
+								<key>OutputName</key>
+								<string>Repeat Item</string>
+								<key>OutputUUID</key>
+								<string>EC61805D-B988-43A4-B851-436ECE598805</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+							<key>{4, 1}</key>
+							<dict>
+								<key>Aggrandizements</key>
+								<array>
+									<dict>
+										<key>PropertyName</key>
+										<string>Sender</string>
+										<key>Type</key>
+										<string>WFPropertyVariableAggrandizement</string>
+									</dict>
+								</array>
+								<key>OutputName</key>
+								<string>Repeat Item</string>
+								<key>OutputUUID</key>
+								<string>EC61805D-B988-43A4-B851-436ECE598805</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>De: ￼ | Asunto: ￼ | Mensaje: ￼
+
+</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.appendvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Email Block</string>
+						<key>OutputUUID</key>
+						<string>461A72CB-1076-4B87-99FE-C872C876BDC3</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+				<key>WFVariableName</key>
+				<string>emailList</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.repeat.each</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>175A14CB-CFB4-48C7-9881-905C4B4BB3E7</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.getvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Email List</string>
+				<key>UUID</key>
+				<string>967CE7AA-D58F-46D3-AFBA-6B93DDDF4EE7</string>
+				<key>WFVariable</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>Type</key>
+						<string>Variable</string>
+						<key>VariableName</key>
+						<string>emailList</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Prompt</string>
+				<key>UUID</key>
+				<string>7D9C992D-BF5F-419B-8503-0F1AE41D87C3</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{339, 1}</key>
+							<dict>
+								<key>OutputName</key>
+								<string>Email List</string>
+								<key>OutputUUID</key>
+								<string>967CE7AA-D58F-46D3-AFBA-6B93DDDF4EE7</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>Eres un asistente ejecutivo de email. Clasifica estos correos en español en tres categorías con este formato exacto:
+
+🔴 ACTION ITEMS
+• [Remitente] Resumen — Acción requerida
+
+🟡 HIGHLIGHTS
+• [Remitente] Resumen
+
+🔵 FYIs
+• [Remitente] Resumen
+
+Si una categoría está vacía escribe: (ninguno)
+No agregues texto fuera de este formato.
+
+CORREOS:
+￼</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>com.openai.chat.ask-chatgpt-shortcut-action</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>ChatGPT Response</string>
+				<key>UUID</key>
+				<string>195FAF84-3EF4-4EFB-BA45-81AA450D74D7</string>
+				<key>prompt</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Prompt</string>
+						<key>OutputUUID</key>
+						<string>7D9C992D-BF5F-419B-8503-0F1AE41D87C3</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.date</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Current Date</string>
+				<key>UUID</key>
+				<string>AB92D21A-072E-489B-9AD1-35B588009F01</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.format.date</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Formatted Date</string>
+				<key>UUID</key>
+				<string>6C34AFE5-014D-4DAD-9D16-713C25107BDF</string>
+				<key>WFDateFormat</key>
+				<string>dd/MM/yyyy</string>
+				<key>WFDateFormatStyle</key>
+				<string>Custom</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Current Date</string>
+						<key>OutputUUID</key>
+						<string>AB92D21A-072E-489B-9AD1-35B588009F01</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>CustomOutputName</key>
+				<string>Note Content</string>
+				<key>UUID</key>
+				<string>6A9A9D69-0818-4DE6-8BD5-9E21630B300F</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{11, 1}</key>
+							<dict>
+								<key>OutputName</key>
+								<string>Formatted Date</string>
+								<key>OutputUUID</key>
+								<string>6C34AFE5-014D-4DAD-9D16-713C25107BDF</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+							<key>{14, 1}</key>
+							<dict>
+								<key>OutputName</key>
+								<string>ChatGPT Response</string>
+								<key>OutputUUID</key>
+								<string>195FAF84-3EF4-4EFB-BA45-81AA450D74D7</string>
+								<key>Type</key>
+								<string>ActionOutput</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>📬 Briefing ￼
+
+￼</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.addnote</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Note Content</string>
+						<key>OutputUUID</key>
+						<string>6A9A9D69-0818-4DE6-8BD5-9E21630B300F</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.notification</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFNotificationActionBody</key>
+				<string>📬 Briefing listo — revisa Notes</string>
+				<key>WFNotificationActionSound</key>
+				<true/>
+				<key>WFNotificationActionTitle</key>
+				<string>MailOver</string>
+			</dict>
+		</dict>
+	</array>
+	<key>WFWorkflowClientVersion</key>
+	<string>1302.1.3</string>
+	<key>WFWorkflowHasOutputFallback</key>
+	<false/>
+	<key>WFWorkflowIcon</key>
+	<dict>
+		<key>WFWorkflowIconGlyphNumber</key>
+		<integer>59511</integer>
+		<key>WFWorkflowIconStartColor</key>
+		<integer>463140863</integer>
+	</dict>
+	<key>WFWorkflowImportQuestions</key>
+	<array/>
+	<key>WFWorkflowInputContentItemClasses</key>
+	<array/>
+	<key>WFWorkflowMinimumClientVersionString</key>
+	<string>1300</string>
+	<key>WFWorkflowName</key>
+	<string>MailOver Clone</string>
+	<key>WFWorkflowNoInputBehavior</key>
+	<dict>
+		<key>Name</key>
+		<string>RunImmediately</string>
+		<key>Parameters</key>
+		<dict/>
+	</dict>
+	<key>WFWorkflowTypes</key>
+	<array/>
+</dict>
+</plist>
