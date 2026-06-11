@@ -79,6 +79,7 @@
       <div id="sync-banner" class="sync-banner hidden" role="status" aria-live="polite"></div>
       <ul id="email-list" class="email-list" role="list" aria-label="Correos"></ul>
       <button id="btn-load-more" class="btn-load-more hidden">Cargar más</button>
+      <button id="btn-vaciar-papelera" class="btn-load-more btn-danger-outline hidden">Vaciar papelera</button>
       <div id="empty-state" class="empty-state hidden" aria-live="polite">
         <div class="empty-orb" aria-hidden="true"></div>
         <p id="empty-title" class="empty-title">Nada por aquí</p>
@@ -93,6 +94,7 @@
       <button class="pill-item" data-cat="boletines">Boletines<span class="badge hidden" aria-hidden="true"></span></button>
       <button class="pill-item" data-cat="archivo">Archivo<span class="badge hidden" aria-hidden="true"></span></button>
       <button class="pill-item pill-otros" data-cat="otros">Otros<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item pill-papelera" data-cat="papelera">Papelera<span class="badge hidden" aria-hidden="true"></span></button>
     </nav>
   </div>
 
@@ -106,6 +108,9 @@
         </button>
         <div class="topbar-actions">
           <button id="btn-focus" class="topbar-text-btn btn-focus-toggle" title="Modo lectura (F)" aria-label="Modo lectura">Enfocar</button>
+          <button id="btn-snooze" class="icon-btn" title="Posponer" aria-label="Posponer correo">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
           <button id="btn-destacar" class="icon-btn btn-star" title="Destacar" aria-label="Destacar" aria-pressed="false">
             <svg id="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </button>
@@ -207,7 +212,64 @@
     </main>
   </div>
 
-  <div id="toast" class="toast hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+  <!-- Vista de hilo -->
+  <div id="thread" class="screen hidden">
+    <header class="topbar" role="banner">
+      <div class="topbar-inner">
+        <button id="btn-thread-back" class="topbar-back" aria-label="Volver">
+          <svg width="8" height="13" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 1 1 7 7 13"/></svg>
+          Volver
+        </button>
+        <span id="thread-title" class="topbar-title" style="flex:1;text-align:center;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px"></span>
+        <div style="width:56px"></div>
+      </div>
+    </header>
+    <main class="content" style="padding-bottom:40px">
+      <div id="thread-list"></div>
+    </main>
+  </div>
+
+  <!-- Diálogo de snooze -->
+  <div id="snooze-dialog" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Posponer correo">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title">Recordar después</span>
+        <button id="snooze-close" class="icon-btn" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="snooze-options">
+        <button id="snooze-tarde" class="snooze-btn" data-snooze data-until="">
+          <span class="snooze-icon">🌇</span>
+          <span>Esta tarde</span>
+          <span class="snooze-time">17:00</span>
+        </button>
+        <button id="snooze-manana" class="snooze-btn" data-snooze data-until="">
+          <span class="snooze-icon">🌅</span>
+          <span>Mañana</span>
+          <span class="snooze-time">9:00</span>
+        </button>
+        <button id="snooze-semana" class="snooze-btn" data-snooze data-until="">
+          <span class="snooze-icon">📅</span>
+          <span>Próxima semana</span>
+          <span class="snooze-time">Lun 9:00</span>
+        </button>
+        <div class="snooze-custom-row">
+          <label class="snooze-custom-label">Elegir fecha</label>
+          <input id="snooze-custom" type="datetime-local" class="snooze-custom-input">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner offline -->
+  <div id="offline-banner" class="offline-banner hidden" role="alert">
+    Sin conexión — puedes leer correos guardados
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite" aria-atomic="true">
+    <span class="toast-msg"></span>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

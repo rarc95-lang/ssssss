@@ -1056,3 +1056,211 @@ textarea:focus, .field:focus {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ================================================================
+   Mejoras v2 — Hilos, Papelera, Snooze, PWA, Offline
+   ================================================================ */
+
+/* Papelera en pill */
+.pill-papelera { color: var(--t3); }
+.pill-papelera.active { background: #FEF2F2; color: #DC2626; }
+
+/* Contador en email de hilo */
+.thread-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: 9px;
+  font-size: 10.5px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* Botón restaurar en papelera */
+.row-restore {
+  flex-shrink: 0;
+  color: var(--t4);
+  margin-left: 4px;
+}
+.row-restore:hover { color: var(--accent); background: var(--accent-light); }
+
+/* Vaciar papelera */
+.btn-danger-outline {
+  color: #DC2626;
+  background: transparent;
+  border-color: rgba(220,38,38,.2);
+}
+.btn-danger-outline:hover { background: #FEF2F2; }
+
+/* Vista de hilo */
+.thread-message {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 16px;
+}
+.thread-message:last-child { border-bottom: none; }
+.thread-msg-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.thread-msg-from {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--t1);
+}
+.thread-msg-date {
+  font-size: 11.5px;
+  color: var(--t4);
+}
+.thread-msg-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--t2);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+.thread-msg-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Modal / Snooze */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 400;
+  padding: 0 0 env(safe-area-inset-bottom, 0);
+}
+.modal-overlay.hidden { display: none; }
+.modal-card {
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px 0 32px;
+  box-shadow: 0 -4px 40px rgba(0,0,0,.12);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t1);
+}
+.snooze-options { padding: 8px 0; }
+.snooze-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  font-size: 14.5px;
+  color: var(--t1);
+  cursor: pointer;
+  text-align: left;
+}
+.snooze-btn:hover { background: var(--bg-subtle); }
+.snooze-icon { font-size: 18px; width: 24px; text-align: center; }
+.snooze-time {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--t4);
+}
+.snooze-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+}
+.snooze-custom-label {
+  font-size: 14.5px;
+  color: var(--t1);
+  flex: 1;
+}
+.snooze-custom-input {
+  border: 1px solid var(--line-medium);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--t2);
+  font-family: inherit;
+  background: var(--bg-subtle);
+}
+
+/* Toast con botón deshacer */
+.toast {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+.toast.hidden { display: none !important; }
+.toast-msg { flex: 1; }
+.toast-undo {
+  flex-shrink: 0;
+  background: rgba(255,255,255,.18);
+  border: none;
+  border-radius: 7px;
+  padding: 4px 10px;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.toast-undo:hover { background: rgba(255,255,255,.28); }
+
+/* Banner offline */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #F59E0B;
+  color: #78350F;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  z-index: 1000;
+}
+.offline-banner.hidden { display: none; }
+
+/* Snooze button en topbar */
+#btn-snooze { color: var(--t4); }
+#btn-snooze:hover { color: var(--accent); background: var(--accent-light); }
+
+/* Reglas con chip de categoría */
+.rule-cat.cat-chip {
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+@media (min-width: 700px) {
+  .modal-overlay { align-items: center; }
+  .modal-card { border-radius: 16px; max-width: 400px; }
+}

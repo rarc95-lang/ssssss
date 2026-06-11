@@ -4,19 +4,16 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
-# Verificar Node.js
 if ! command -v node &>/dev/null; then
   echo "Error: Node.js no está instalado. Instálalo desde https://nodejs.org" >&2
   exit 1
 fi
 
-# Instalar dependencias si no existen
 if [ ! -d node_modules ]; then
   echo "Instalando dependencias…"
   npm install --silent
 fi
 
-# Verificar .env
 if [ ! -f .env ]; then
   if [ -f .env.example ]; then
     echo "Crea un archivo .env a partir de .env.example antes de continuar."
@@ -29,4 +26,4 @@ fi
 
 PORT="${PORT:-3000}"
 echo "SinMail → http://localhost:$PORT"
-exec node server.js
+exec npx --no-install tsx server.ts
