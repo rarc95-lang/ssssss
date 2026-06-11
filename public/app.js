@@ -79,7 +79,7 @@ function renderSkeletons(n = 5) {
           <span class="skeleton sk-date"></span>
         </div>
         <div class="skeleton sk-subject"></div>
-        <div class="skeleton sk-summary"></div>
+        <div class="skeleton sk-preview"></div>
       </div>
     </li>`).join('');
 }
@@ -129,16 +129,17 @@ async function cargarBandeja(mostrarSkeleton = false) {
     li.className = 'email-row' + (esOtros ? ' otros-row' : '');
     li.setAttribute('role', 'listitem');
 
-    const starHtml = e.destacado ? '<span class="email-star" aria-label="Destacado">★</span>' : '';
+    const starHtml = e.destacado ? '<span class="row-star" aria-label="Destacado" aria-hidden="true">★</span>' : '';
+    const catClass = `d-${(e.categoria || 'otros')}`;
     li.innerHTML = `
-      <span class="dot ${e.leido ? 'read' : ''}" aria-hidden="true"></span>
+      <span class="dot ${catClass}${e.leido ? ' read' : ''}" aria-hidden="true"></span>
       <div class="email-main">
         <div class="email-top">
           <span class="email-from">${escapeHtml(e.remitente || e.remitente_email || '(desconocido)')}</span>
           <span class="email-date">${fmtFecha(e.fecha)}</span>
         </div>
-        <div class="email-subject${e.leido ? ' dimmed' : ''}">${escapeHtml(e.asunto || '(sin asunto)')}</div>
-        <div class="email-summary">${escapeHtml(e.resumen || e.snippet || '')}</div>
+        <div class="email-subject${e.leido ? ' read' : ''}">${escapeHtml(e.asunto || '(sin asunto)')}</div>
+        <div class="email-preview">${escapeHtml(e.resumen || e.snippet || '')}</div>
       </div>
       ${starHtml}`;
 
@@ -241,7 +242,8 @@ function actualizarBtnLeido(leido) {
 
 function actualizarBtnDestacado(destacado) {
   const btn = $('#btn-destacar');
-  btn.textContent = destacado ? '★' : '☆';
+  const svg = btn.querySelector('svg');
+  if (svg) svg.setAttribute('fill', destacado ? 'currentColor' : 'none');
   btn.classList.toggle('starred', destacado);
   btn.setAttribute('aria-pressed', String(destacado));
 }
@@ -413,6 +415,7 @@ $('#btn-compose-ai').onclick = async () => {
   const instruccion = $('#c-instruction').value.trim();
   if (!instruccion) return toast('Escribe una instrucción para la IA');
   const btn = $('#btn-compose-ai');
+  btn._orig = btn.textContent;
   btn.disabled = true; btn.textContent = 'Generando…';
   try {
     const { borrador } = await api('/api/draft', { method: 'POST', body: { instruccion } });
@@ -421,7 +424,7 @@ $('#btn-compose-ai').onclick = async () => {
   } catch (e) {
     toast(e.message, 5000);
   } finally {
-    btn.disabled = false; btn.textContent = 'Redactar con IA';
+    btn.disabled = false; btn.textContent = btn._orig || 'Redactar con IA';
   }
 };
 

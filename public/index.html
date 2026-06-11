@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>sinmail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,10 +17,18 @@
       <div class="logo logo-lg" aria-hidden="true">
         <div class="logo-cut"></div>
       </div>
-      <h1 class="wordmark wordmark-lg"><span class="wm-sin">sin</span><span class="wm-mail">mail</span></h1>
-      <p class="welcome-sub">Un mail, sin el caos.<br>Tu bandeja clasificada por intención, con IA.</p>
+      <h1 class="wordmark wordmark-lg">
+        <span class="wm-sin">sin</span><span class="wm-mail">mail</span>
+      </h1>
+      <p class="welcome-sub">Un mail, sin el caos.</p>
+      <p class="welcome-desc">Tu bandeja clasificada por intención, con IA.</p>
       <a class="btn-google" href="/api/auth/google" aria-label="Iniciar sesión con Google">
-        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+          <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+        </svg>
         Continuar con Google
       </a>
     </div>
@@ -29,12 +40,18 @@
       <div class="topbar-inner">
         <div class="brand">
           <div class="logo logo-sm" aria-hidden="true"><div class="logo-cut"></div></div>
-          <span class="wordmark wordmark-sm"><span class="wm-sin">sin</span><span class="wm-mail">mail</span></span>
+          <span class="wordmark wordmark-sm">
+            <span class="wm-sin">sin</span><span class="wm-mail">mail</span>
+          </span>
         </div>
         <div class="topbar-actions">
-          <button id="btn-compose" class="icon-btn" title="Redactar nuevo correo" aria-label="Redactar">✎</button>
-          <button id="btn-refresh" class="icon-btn" title="Sincronizar" aria-label="Actualizar">⟳</button>
-          <button id="btn-logout" class="icon-btn icon-btn-text">Salir</button>
+          <button id="btn-compose" class="icon-btn" title="Redactar" aria-label="Redactar nuevo correo">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button id="btn-refresh" class="icon-btn" title="Sincronizar" aria-label="Actualizar correos">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          </button>
+          <button id="btn-logout" class="topbar-text-btn">Salir</button>
         </div>
       </div>
     </header>
@@ -44,19 +61,20 @@
       <div id="sync-banner" class="sync-banner hidden" role="status" aria-live="polite"></div>
       <ul id="email-list" class="email-list" role="list" aria-label="Correos"></ul>
       <div id="empty-state" class="empty-state hidden" aria-live="polite">
+        <div class="empty-icon" aria-hidden="true"></div>
         <p id="empty-title" class="empty-title">Nada por aquí</p>
         <p id="empty-sub" class="empty-sub"></p>
       </div>
     </main>
 
-    <!-- Píldora flotante de categorías -->
+    <!-- Navegación inferior -->
     <nav class="pill" aria-label="Categorías">
-      <button class="pill-item active" data-cat="urgente">Urgente<span class="badge hidden" aria-hidden="true"></span></button>
-      <button class="pill-item" data-cat="por_responder">Responder<span class="badge hidden" aria-hidden="true"></span></button>
-      <button class="pill-item" data-cat="para_leer">Leer<span class="badge hidden" aria-hidden="true"></span></button>
-      <button class="pill-item" data-cat="boletines">Boletines<span class="badge hidden" aria-hidden="true"></span></button>
-      <button class="pill-item" data-cat="archivo">Archivo<span class="badge hidden" aria-hidden="true"></span></button>
-      <button class="pill-item pill-otros" data-cat="otros">Otros<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item active" data-cat="urgente" aria-label="Urgente">Urgente<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item" data-cat="por_responder" aria-label="Por responder">Responder<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item" data-cat="para_leer" aria-label="Para leer">Leer<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item" data-cat="boletines" aria-label="Boletines">Boletines<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item" data-cat="archivo" aria-label="Archivo">Archivo<span class="badge hidden" aria-hidden="true"></span></button>
+      <button class="pill-item pill-otros" data-cat="otros" aria-label="Otros">Otros<span class="badge hidden" aria-hidden="true"></span></button>
     </nav>
   </div>
 
@@ -64,44 +82,59 @@
   <div id="reader" class="screen hidden">
     <header class="topbar" role="banner">
       <div class="topbar-inner">
-        <button id="btn-back" class="icon-btn icon-btn-text" aria-label="Volver">‹ Volver</button>
+        <button id="btn-back" class="topbar-back" aria-label="Volver">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 1 1 7 7 13"/></svg>
+          Volver
+        </button>
         <div class="topbar-actions">
-          <button id="btn-destacar" class="icon-btn btn-star" title="Destacar" aria-label="Destacar" aria-pressed="false">☆</button>
-          <button id="btn-toggle-read" class="icon-btn icon-btn-text">No leído</button>
-          <button id="btn-archive" class="icon-btn icon-btn-text">Archivar</button>
+          <button id="btn-destacar" class="icon-btn btn-star" title="Destacar" aria-label="Destacar" aria-pressed="false">
+            <svg id="star-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <button id="btn-toggle-read" class="topbar-text-btn">No leído</button>
+          <button id="btn-archive" class="topbar-text-btn">Archivar</button>
         </div>
       </div>
     </header>
+
     <main class="content reader-content">
-      <div class="ai-summary">
-        <div class="ai-chip-row">
-          <span class="ai-chip">Resumen IA</span>
+      <!-- Resumen IA -->
+      <div class="ai-card">
+        <div class="ai-card-header">
+          <span class="ai-label">IA</span>
           <span id="cat-chip" class="cat-chip"></span>
         </div>
-        <p id="r-resumen"></p>
-        <p id="otros-hint" class="otros-hint hidden">La IA no encontró suficiente claridad para clasificar este correo automáticamente. Puedes moverlo a donde corresponda.</p>
+        <p id="r-resumen" class="ai-resumen"></p>
+        <p id="otros-hint" class="otros-hint hidden">La IA no encontró suficiente claridad para clasificar este correo. Puedes moverlo abajo.</p>
       </div>
+
+      <!-- Cabecera del correo -->
       <h2 id="r-asunto" class="reader-subject"></h2>
       <div class="reader-meta">
-        <span id="r-remitente" class="meta-remitente"></span>
-        <span id="r-fecha" class="meta-secondary"></span>
+        <div class="reader-meta-from">
+          <span id="r-remitente" class="meta-from"></span>
+        </div>
+        <span id="r-fecha" class="meta-date"></span>
       </div>
-      <hr class="hairline">
+
+      <div class="reader-divider"></div>
+
+      <!-- Cuerpo -->
       <div id="r-cuerpo" class="reader-body"></div>
 
       <!-- Reclasificar -->
       <div class="reclassify-section">
-        <p class="reclassify-label">Mover a categoría</p>
+        <p class="section-label">Mover a</p>
         <div class="reclassify-grid" id="reclassify-grid" role="group" aria-label="Elegir categoría"></div>
       </div>
 
-      <div class="reply-box">
-        <label class="reply-label" for="reply-instruction">Responder con IA</label>
-        <textarea id="reply-instruction" rows="2" placeholder="Escribe una instrucción breve: «acepto, propongo el jueves a las 10»"></textarea>
+      <!-- Responder con IA -->
+      <div class="reply-section">
+        <p class="section-label" id="reply-label-lbl">Responder con IA</p>
+        <textarea id="reply-instruction" rows="2" placeholder="Ej: acepto, propongo el jueves a las 10" aria-labelledby="reply-label-lbl"></textarea>
         <button id="btn-gen-reply" class="btn-primary">Generar borrador</button>
         <div id="draft-area" class="hidden">
-          <textarea id="draft-body" rows="8" aria-label="Borrador de respuesta"></textarea>
-          <button id="btn-send-reply" class="btn-primary">Enviar respuesta</button>
+          <textarea id="draft-body" rows="7" aria-label="Borrador de respuesta"></textarea>
+          <button id="btn-send-reply" class="btn-primary btn-send">Enviar respuesta</button>
         </div>
       </div>
     </main>
@@ -111,19 +144,28 @@
   <div id="composer" class="screen hidden">
     <header class="topbar" role="banner">
       <div class="topbar-inner">
-        <button id="btn-compose-back" class="icon-btn icon-btn-text" aria-label="Cancelar">‹ Cancelar</button>
+        <button id="btn-compose-back" class="topbar-back" aria-label="Cancelar">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 1 1 7 7 13"/></svg>
+          Cancelar
+        </button>
         <span class="topbar-title">Nuevo correo</span>
-        <button id="btn-compose-send" class="icon-btn icon-btn-text strong">Enviar</button>
+        <button id="btn-compose-send" class="btn-send-inline">Enviar</button>
       </div>
     </header>
-    <main class="content">
-      <input id="c-to" class="field" type="email" placeholder="Para" autocomplete="email" aria-label="Destinatario">
-      <input id="c-subject" class="field" type="text" placeholder="Asunto" aria-label="Asunto">
-      <div class="compose-ai">
-        <input id="c-instruction" class="field" type="text" placeholder="Instrucción para la IA (opcional)" aria-label="Instrucción para la IA">
-        <button id="btn-compose-ai" class="btn-secondary">Redactar con IA</button>
+    <main class="compose-content">
+      <div class="compose-field-row">
+        <label class="compose-field-label" for="c-to">Para</label>
+        <input id="c-to" class="compose-field" type="email" autocomplete="email" aria-label="Destinatario">
       </div>
-      <textarea id="c-body" class="field" rows="12" placeholder="Escribe tu correo…" aria-label="Cuerpo del correo"></textarea>
+      <div class="compose-field-row">
+        <label class="compose-field-label" for="c-subject">Asunto</label>
+        <input id="c-subject" class="compose-field" type="text" aria-label="Asunto">
+      </div>
+      <div class="compose-ai-row">
+        <input id="c-instruction" class="compose-field compose-ai-input" type="text" placeholder="Instrucción para la IA (opcional)" aria-label="Instrucción para la IA">
+        <button id="btn-compose-ai" class="btn-ai">Redactar con IA</button>
+      </div>
+      <textarea id="c-body" class="compose-body" placeholder="Escribe tu correo…" aria-label="Cuerpo del correo"></textarea>
     </main>
   </div>
 
