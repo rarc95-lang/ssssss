@@ -11,7 +11,7 @@ function loadPrompt(name) {
   return fs.readFileSync(path.join(promptsDir, name), 'utf8');
 }
 
-const CATEGORIAS = ['urgente', 'por_responder', 'para_leer', 'boletines', 'archivo'];
+const CATEGORIAS = ['urgente', 'por_responder', 'para_leer', 'boletines', 'archivo', 'otros'];
 
 // --- Throttling para la capa gratuita de Groq (30 req/min) ---
 // Serializa las llamadas con un intervalo mínimo de 2,1 s entre peticiones
@@ -62,7 +62,7 @@ export async function classifyEmail({ remitente, remitente_email, asunto, cuerpo
     return { categoria, resumen };
   } catch (e) {
     console.error(`[clasificador] error con "${asunto}":`, e.message);
-    return { categoria: 'para_leer', resumen: asunto || '(sin resumen)' };
+    return { categoria: 'otros', resumen: asunto || '(sin resumen)' };
   }
 }
 

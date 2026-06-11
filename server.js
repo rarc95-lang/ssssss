@@ -11,7 +11,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json({ limit: '1mb' }));
 
-// Parser de cookies mínimo (sin dependencia extra)
 app.use((req, _res, next) => {
   req.cookies = Object.fromEntries(
     (req.headers.cookie || '').split(';').filter(Boolean).map((c) => {
@@ -52,7 +51,6 @@ app.get('/api/me', (req, res) => {
 });
 
 // ---------- Sincronización y clasificación ----------
-// Estado de sincronización por usuario (para la barra de progreso del frontend)
 const syncState = new Map();
 
 app.post('/api/sync', requireAuth, async (req, res) => {
@@ -71,15 +69,25 @@ app.post('/api/sync', requireAuth, async (req, res) => {
     const nuevos = mensajes.filter((m) => !existing.has(m.gmail_id));
     syncState.set(userId, { running: true, total: nuevos.length, done: 0, error: null });
 
+    // Reglas personales: aplicar antes de llamar a la IA
+    const rulesArr = db.prepare('SELECT remitente_email, categoria FROM user_rules WHERE user_id = ?').all(userId);
+    const rules = new Map(rulesArr.map((r) => [r.remitente_email.toLowerCase(), r.categoria]));
+
     const insert = db.prepare(`
       INSERT OR IGNORE INTO emails
         (user_id, gmail_id, thread_id, remitente, remitente_email, destinatario,
-         asunto, snippet, cuerpo, fecha, categoria, resumen, leido)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+         asunto, snippet, cuerpo, fecha, categoria, resumen, leido, destacado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`);
 
     for (const m of nuevos) {
-      // Los correos ya clasificados nunca se reclasifican (persisten en SQLite).
-      const { categoria, resumen } = await classifyEmail(m);
+      let categoria, resumen;
+      const ruleKey = (m.remitente_email || '').toLowerCase();
+      if (rules.has(ruleKey)) {
+        categoria = rules.get(ruleKey);
+        resumen = m.asunto || '(sin resumen)';
+      } else {
+        ({ categoria, resumen } = await classifyEmail(m));
+      }
       insert.run(userId, m.gmail_id, m.thread_id, m.remitente, m.remitente_email,
         m.destinatario, m.asunto, m.snippet, m.cuerpo, m.fecha, categoria, resumen, m.leido);
       const st = syncState.get(userId);
@@ -97,11 +105,13 @@ app.get('/api/sync/status', requireAuth, (req, res) => {
 });
 
 // ---------- Bandeja ----------
+const COLS = 'id, remitente, remitente_email, asunto, snippet, resumen, fecha, categoria, leido, destacado';
+
 app.get('/api/emails', requireAuth, (req, res) => {
   const { categoria } = req.query;
   const rows = categoria
-    ? db.prepare('SELECT id, remitente, asunto, snippet, resumen, fecha, categoria, leido FROM emails WHERE user_id = ? AND categoria = ? ORDER BY fecha DESC').all(req.user.id, categoria)
-    : db.prepare('SELECT id, remitente, asunto, snippet, resumen, fecha, categoria, leido FROM emails WHERE user_id = ? ORDER BY fecha DESC').all(req.user.id);
+    ? db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? AND categoria = ? ORDER BY destacado DESC, fecha DESC`).all(req.user.id, categoria)
+    : db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? ORDER BY destacado DESC, fecha DESC`).all(req.user.id);
   res.json({ emails: rows });
 });
 
@@ -128,6 +138,43 @@ app.post('/api/emails/:id/leido', requireAuth, (req, res) => {
 app.post('/api/emails/:id/archivar', requireAuth, (req, res) => {
   db.prepare("UPDATE emails SET categoria = 'archivo' WHERE id = ? AND user_id = ?")
     .run(req.params.id, req.user.id);
+  res.json({ ok: true });
+});
+
+app.post('/api/emails/:id/destacar', requireAuth, (req, res) => {
+  db.prepare('UPDATE emails SET destacado = ? WHERE id = ? AND user_id = ?')
+    .run(req.body.destacado ? 1 : 0, req.params.id, req.user.id);
+  res.json({ ok: true });
+});
+
+app.post('/api/emails/:id/reclasificar', requireAuth, (req, res) => {
+  const VALID = ['urgente', 'por_responder', 'para_leer', 'boletines', 'archivo', 'otros'];
+  const { categoria } = req.body;
+  if (!VALID.includes(categoria)) return res.status(400).json({ error: 'Categoría inválida' });
+  const email = db.prepare('SELECT remitente_email FROM emails WHERE id = ? AND user_id = ?')
+    .get(req.params.id, req.user.id);
+  if (!email) return res.status(404).json({ error: 'No encontrado' });
+  db.prepare('UPDATE emails SET categoria = ? WHERE id = ? AND user_id = ?')
+    .run(categoria, req.params.id, req.user.id);
+  res.json({ ok: true, remitente_email: email.remitente_email });
+});
+
+// ---------- Reglas personales ----------
+app.get('/api/rules', requireAuth, (req, res) => {
+  const rules = db.prepare('SELECT * FROM user_rules WHERE user_id = ? ORDER BY created_at DESC').all(req.user.id);
+  res.json({ rules });
+});
+
+app.post('/api/rules', requireAuth, (req, res) => {
+  const { remitente_email, categoria } = req.body;
+  if (!remitente_email || !categoria) return res.status(400).json({ error: 'Faltan datos' });
+  db.prepare('INSERT OR REPLACE INTO user_rules (user_id, remitente_email, categoria) VALUES (?, ?, ?)')
+    .run(req.user.id, remitente_email.toLowerCase(), categoria);
+  res.json({ ok: true });
+});
+
+app.delete('/api/rules/:id', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM user_rules WHERE id = ? AND user_id = ?').run(req.params.id, req.user.id);
   res.json({ ok: true });
 });
 
@@ -161,7 +208,6 @@ app.post('/api/send', requireAuth, async (req, res) => {
       if (orig) {
         threadId = orig.thread_id;
         inReplyToMessageId = orig.gmail_id;
-        // Al responder, el correo pasa a Archivo (procesado)
         db.prepare("UPDATE emails SET categoria = 'archivo', leido = 1 WHERE id = ?").run(orig.id);
       }
     }
