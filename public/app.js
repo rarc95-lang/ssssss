@@ -30,8 +30,15 @@ const EMPTY_SUBS = {
 
 const FRASES_ARCHIVO = ['Cerrado.', 'Resuelto.', 'Guardado.', 'Ciclo completado.', 'Todo en su lugar.'];
 
+const PAGE = 50;
+
 let categoriaActual = 'urgente';
-let emailActual = null;
+let emailActual     = null;
+let deleteConfirm   = false;
+let paginaOffset    = 0;
+let paginaTotal     = 0;
+let searchActive    = false;
+let searchTimer     = null;
 
 // ---------- utilidades ----------
 async function api(path, opts = {}) {
@@ -40,6 +47,10 @@ async function api(path, opts = {}) {
     ...opts,
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
+  if (res.status === 401) {
+    show('welcome');
+    throw new Error('Sesión expirada. Vuelve a iniciar sesión.');
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
   return data;
@@ -54,7 +65,7 @@ function toast(msg, ms = 3000) {
 }
 
 function show(screenId) {
-  for (const id of ['welcome', 'inbox', 'reader', 'composer']) {
+  for (const id of ['welcome', 'inbox', 'reader', 'composer', 'rules']) {
     $('#' + id).classList.toggle('hidden', id !== screenId);
   }
   window.scrollTo(0, 0);
@@ -78,7 +89,7 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// ---------- skeleton (estado de carga) ----------
+// ---------- skeleton ----------
 function renderSkeletons(n = 5) {
   const list = $('#email-list');
   list.innerHTML = Array.from({ length: n }, () => `
@@ -95,39 +106,19 @@ function renderSkeletons(n = 5) {
     </li>`).join('');
 }
 
-// ---------- bandeja ----------
-async function cargarBandeja(mostrarSkeleton = false) {
-  if (mostrarSkeleton) renderSkeletons();
-
-  const [{ emails }, { counts }] = await Promise.all([
-    api(`/api/emails?categoria=${categoriaActual}`),
-    api('/api/emails/counts'),
-  ]);
-
-  // Actualizar título
-  $('#cat-title').textContent = NOMBRES[categoriaActual];
-
-  // Contadores de no leídos en la píldora
-  document.querySelectorAll('.pill-item').forEach((btn) => {
-    const c = counts[btn.dataset.cat];
-    const badge = btn.querySelector('.badge');
-    if (c && c.no_leidos > 0) {
-      badge.textContent = c.no_leidos;
-      badge.classList.remove('hidden');
-    } else {
-      badge.classList.add('hidden');
-    }
-  });
-
-  const list = $('#email-list');
-  list.innerHTML = '';
-
+// ---------- renderizar filas ----------
+function renderEmails(emails, append = false, emptyTitle, emptySub) {
+  const list  = $('#email-list');
   const empty = $('#empty-state');
-  if (emails.length === 0) {
-    empty.classList.remove('hidden');
-    $('#empty-title').textContent = EMPTY_TITLES[categoriaActual] || 'Nada por aquí';
-    $('#empty-sub').textContent = EMPTY_SUBS[categoriaActual] || '';
-  } else {
+
+  if (!append) {
+    list.innerHTML = '';
+    if (emails.length === 0) {
+      empty.classList.remove('hidden');
+      $('#empty-title').textContent = emptyTitle ?? EMPTY_TITLES[categoriaActual] ?? 'Nada por aquí';
+      $('#empty-sub').textContent   = emptySub   ?? EMPTY_SUBS[categoriaActual]   ?? '';
+      return;
+    }
     empty.classList.add('hidden');
   }
 
@@ -137,11 +128,14 @@ async function cargarBandeja(mostrarSkeleton = false) {
     const li = document.createElement('li');
     li.className = 'email-row' + (esOtros ? ' otros-row' : '');
     li.setAttribute('role', 'listitem');
+    li.dataset.id        = String(e.id);
+    li.dataset.destacado = e.destacado ? '1' : '0';
 
-    const starHtml = e.destacado ? '<span class="row-star" aria-label="Destacado" aria-hidden="true">★</span>' : '';
-    const catClass = `d-${(e.categoria || 'otros')}`;
+    const starHtml = e.destacado
+      ? '<span class="row-star" aria-label="Destacado" aria-hidden="true">★</span>'
+      : '';
     li.innerHTML = `
-      <span class="dot ${catClass}${e.leido ? ' read' : ''}" aria-hidden="true"></span>
+      <span class="dot d-${e.categoria || 'otros'}${e.leido ? ' read' : ''}" aria-hidden="true"></span>
       <div class="email-main">
         <div class="email-top">
           <span class="email-from">${escapeHtml(e.remitente || e.remitente_email || '(desconocido)')}</span>
@@ -153,13 +147,132 @@ async function cargarBandeja(mostrarSkeleton = false) {
       ${starHtml}`;
 
     li.onclick = () => abrirEmail(e.id);
+    agregarSwipe(li, e);
     list.appendChild(li);
+  }
+}
+
+// ---------- gestos swipe (móvil) ----------
+function agregarSwipe(li, e) {
+  let startX = 0, startY = 0, moved = false;
+
+  li.addEventListener('touchstart', (ev) => {
+    startX = ev.touches[0].clientX;
+    startY = ev.touches[0].clientY;
+    moved = false;
+    li.style.transition = 'none';
+  }, { passive: true });
+
+  li.addEventListener('touchmove', (ev) => {
+    const dx = ev.touches[0].clientX - startX;
+    const dy = ev.touches[0].clientY - startY;
+    if (!moved && Math.abs(dy) > Math.abs(dx)) return;
+    moved = true;
+    const x = Math.max(-110, Math.min(110, dx));
+    li.style.transform  = `translateX(${x}px)`;
+    li.dataset.swipe = dx < -60 ? 'left' : dx > 60 ? 'right' : '';
+  }, { passive: true });
+
+  li.addEventListener('touchend', async () => {
+    li.style.transition = 'transform 0.2s var(--ease), opacity 0.2s';
+    li.style.transform  = '';
+    if (!moved) return;
+    const dir = li.dataset.swipe;
+    li.dataset.swipe = '';
+
+    if (dir === 'left') {
+      try {
+        await api(`/api/emails/${e.id}/archivar`, { method: 'POST' });
+        li.style.opacity = '0';
+        setTimeout(() => li.remove(), 210);
+        toast(FRASES_ARCHIVO[Math.floor(Math.random() * FRASES_ARCHIVO.length)]);
+      } catch {}
+    } else if (dir === 'right') {
+      const nuevo = li.dataset.destacado !== '1';
+      try {
+        await api(`/api/emails/${e.id}/destacar`, { method: 'POST', body: { destacado: nuevo } });
+        li.dataset.destacado = nuevo ? '1' : '0';
+        const star = li.querySelector('.row-star');
+        if (nuevo && !star) {
+          const s = document.createElement('span');
+          s.className = 'row-star';
+          s.setAttribute('aria-hidden', 'true');
+          s.textContent = '★';
+          li.appendChild(s);
+        } else if (!nuevo && star) {
+          star.remove();
+        }
+        toast(nuevo ? '★ Destacado' : 'Eliminado de destacados');
+      } catch {}
+    }
+  });
+}
+
+// ---------- bandeja ----------
+async function cargarBandeja(mostrarSkeleton = false) {
+  if (searchActive) return;
+  paginaOffset = 0;
+  if (mostrarSkeleton) renderSkeletons();
+
+  const [{ emails, total }, { counts }] = await Promise.all([
+    api(`/api/emails?categoria=${categoriaActual}&limit=${PAGE}&offset=0`),
+    api('/api/emails/counts'),
+  ]);
+
+  paginaTotal = total;
+  $('#cat-title').textContent = NOMBRES[categoriaActual];
+
+  document.querySelectorAll('.pill-item').forEach((btn) => {
+    const c = counts[btn.dataset.cat];
+    const badge = btn.querySelector('.badge');
+    if (c && c.no_leidos > 0) {
+      badge.textContent = c.no_leidos;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  });
+
+  renderEmails(emails);
+  $('#btn-load-more').classList.toggle('hidden', emails.length >= total);
+}
+
+async function cargarMas() {
+  paginaOffset += PAGE;
+  const btn = $('#btn-load-more');
+  btn.disabled = true;
+  try {
+    const { emails, total } = await api(
+      `/api/emails?categoria=${categoriaActual}&limit=${PAGE}&offset=${paginaOffset}`
+    );
+    paginaTotal = total;
+    renderEmails(emails, true);
+    btn.classList.toggle('hidden', paginaOffset + emails.length >= total);
+  } catch (e) {
+    toast(e.message, 5000);
+    paginaOffset -= PAGE;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ---------- búsqueda ----------
+async function buscar(q) {
+  try {
+    $('#cat-title').textContent = `"${q}"`;
+    const { emails } = await api(`/api/emails/search?q=${encodeURIComponent(q)}`);
+    renderEmails(emails, false, 'Sin resultados.', `Nada coincide con "${q}".`);
+    $('#btn-load-more').classList.add('hidden');
+  } catch (e) {
+    toast(e.message, 5000);
   }
 }
 
 // ---------- sincronización ----------
 async function sincronizar() {
+  const btnR   = $('#btn-refresh');
   const banner = $('#sync-banner');
+  btnR.disabled = true;
   banner.classList.remove('hidden');
   banner.textContent = 'Buscando correos nuevos…';
   try {
@@ -170,6 +283,7 @@ async function sincronizar() {
         if (st.error) {
           clearInterval(poll);
           banner.classList.add('hidden');
+          btnR.disabled = false;
           toast('Error al sincronizar: ' + st.error, 6000);
           return;
         }
@@ -181,68 +295,64 @@ async function sincronizar() {
         } else {
           clearInterval(poll);
           banner.classList.add('hidden');
-          if (st.total > 0) {
-            toast(`${st.total} correo${st.total > 1 ? 's' : ''} nuevo${st.total > 1 ? 's' : ''}.`);
-          } else {
-            toast('Tu bandeja está al día.');
-          }
+          btnR.disabled = false;
+          toast(st.total > 0
+            ? `${st.total} correo${st.total > 1 ? 's' : ''} nuevo${st.total > 1 ? 's' : ''}.`
+            : 'Tu bandeja está al día.');
           cargarBandeja();
         }
       } catch {
-        // Red momentáneamente caída — continuar polling
+        // red momentáneamente caída — continuar polling
       }
     }, 1500);
   } catch (e) {
     banner.classList.add('hidden');
+    btnR.disabled = false;
     toast(e.message, 5000);
   }
 }
 
 // ---------- lector ----------
 async function abrirEmail(id) {
+  // Resetear estado de eliminación
+  deleteConfirm = false;
+  const btnDel = $('#btn-delete');
+  btnDel.textContent = 'Eliminar';
+  btnDel.classList.remove('btn-danger-text');
+
   const { email } = await api(`/api/emails/${id}`);
   emailActual = email;
 
-  // Resumen + chip de categoría
   $('#r-resumen').textContent = email.resumen || '';
-  const chip = $('#cat-chip');
+  const chip  = $('#cat-chip');
   const catKey = email.categoria || 'otros';
   chip.textContent = NOMBRES[catKey] || catKey;
-  chip.className = `cat-chip cat-${catKey}`;
-
-  // Pista especial para "Otros"
+  chip.className   = `cat-chip cat-${catKey}`;
   $('#otros-hint').classList.toggle('hidden', catKey !== 'otros');
 
-  // Cabecera
   $('#r-asunto').textContent = email.asunto || '(sin asunto)';
-  $('#r-remitente').textContent =
-    email.remitente
-      ? `${email.remitente} · ${email.remitente_email || ''}`
-      : (email.remitente_email || '(desconocido)');
+  $('#r-remitente').textContent = email.remitente
+    ? `${email.remitente} · ${email.remitente_email || ''}`
+    : (email.remitente_email || '(desconocido)');
   $('#r-fecha').textContent = email.fecha
     ? new Date(email.fecha).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })
     : '';
 
-  // Cuerpo
   $('#r-cuerpo').textContent = email.cuerpo || email.snippet || '';
-
-  // Borrador
   $('#reply-instruction').value = '';
   $('#draft-area').classList.add('hidden');
   $('#draft-body').value = '';
 
-  // Estrella
   actualizarBtnDestacado(!!email.destacado);
-
-  // Leído
   actualizarBtnLeido(!!email.leido);
-
-  // Reclasificar
   renderReclassifyGrid(catKey);
+
+  // Resetear modo enfoque
+  $('#reader').classList.remove('focus-mode');
+  $('#btn-focus').classList.remove('active');
 
   show('reader');
 
-  // Marcar como leído si no lo está (optimista: actualizar estado local antes de la red)
   if (!email.leido) {
     emailActual.leido = 1;
     api(`/api/emails/${id}/leido`, { method: 'POST', body: { leido: true } }).catch(() => {});
@@ -284,16 +394,11 @@ async function reclasificar(nuevaCat) {
     const catAnterior = emailActual.categoria;
     emailActual.categoria = nuevaCat;
     renderReclassifyGrid(nuevaCat);
-
-    // Actualizar chip
     const chip = $('#cat-chip');
     chip.textContent = NOMBRES[nuevaCat];
-    chip.className = `cat-chip cat-${nuevaCat}`;
+    chip.className   = `cat-chip cat-${nuevaCat}`;
     $('#otros-hint').classList.add('hidden');
-
     toast(`Movido a ${NOMBRES[nuevaCat]}`);
-
-    // Proponer regla personal si viene de "otros" y tiene remitente
     if (catAnterior === 'otros' && remitente_email && nuevaCat !== 'otros') {
       ofrecerRegla(remitente_email, nuevaCat);
     }
@@ -322,6 +427,44 @@ window.crearRegla = async function (remitente_email, categoria) {
   }
 };
 
+// ---------- pantalla de reglas ----------
+async function cargarReglas() {
+  try {
+    const { rules } = await api('/api/rules');
+    const list  = $('#rules-list');
+    const empty = $('#rules-empty');
+    list.innerHTML = '';
+    if (rules.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    for (const r of rules) {
+      const li = document.createElement('li');
+      li.className = 'rule-item';
+      li.innerHTML = `
+        <div class="rule-info">
+          <span class="rule-email">${escapeHtml(r.remitente_email)}</span>
+          <span class="rule-cat">${NOMBRES[r.categoria] || r.categoria}</span>
+        </div>
+        <button class="rule-delete icon-btn" data-id="${r.id}" aria-label="Eliminar regla">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      list.appendChild(li);
+    }
+    list.querySelectorAll('.rule-delete').forEach((btn) => {
+      btn.onclick = async () => {
+        try {
+          await api(`/api/rules/${btn.dataset.id}`, { method: 'DELETE' });
+          cargarReglas();
+        } catch (e) { toast(e.message, 5000); }
+      };
+    });
+  } catch (e) {
+    toast(e.message, 5000);
+  }
+}
+
 // ---------- eventos de la bandeja ----------
 document.querySelectorAll('.pill-item').forEach((btn) => {
   btn.onclick = () => {
@@ -333,6 +476,32 @@ document.querySelectorAll('.pill-item').forEach((btn) => {
 });
 
 $('#btn-refresh').onclick = sincronizar;
+
+$('#btn-search').onclick = () => {
+  searchActive = !searchActive;
+  $('#search-bar').classList.toggle('hidden', !searchActive);
+  $('#btn-search').classList.toggle('active', searchActive);
+  if (searchActive) {
+    $('#search-input').focus();
+    $('#cat-title').textContent = 'Buscar';
+  } else {
+    $('#search-input').value = '';
+    cargarBandeja(true);
+  }
+};
+
+$('#search-input').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const q = $('#search-input').value.trim();
+  if (!q) { cargarBandeja(); return; }
+  searchTimer = setTimeout(() => buscar(q), 350);
+});
+
+$('#btn-rules').onclick = () => { show('rules'); cargarReglas(); };
+$('#btn-rules-back').onclick = () => show('inbox');
+$('#btn-load-more').onclick = cargarMas;
+
+// ---------- eventos del lector ----------
 $('#btn-back').onclick = () => {
   $('#reader').classList.remove('focus-mode');
   $('#btn-focus').classList.remove('active');
@@ -346,7 +515,6 @@ $('#btn-focus').onclick = () => {
   $('#btn-focus').classList.toggle('active', active);
 };
 
-// ---------- eventos del lector ----------
 $('#btn-destacar').onclick = async () => {
   const nuevo = !emailActual.destacado;
   emailActual.destacado = nuevo ? 1 : 0;
@@ -379,6 +547,34 @@ $('#btn-archive').onclick = async () => {
     await api(`/api/emails/${emailActual.id}/archivar`, { method: 'POST' });
     const frase = FRASES_ARCHIVO[Math.floor(Math.random() * FRASES_ARCHIVO.length)];
     toast(frase);
+    show('inbox');
+    cargarBandeja();
+  } catch (e) {
+    toast(e.message, 5000);
+  }
+};
+
+$('#btn-delete').onclick = async () => {
+  const btn = $('#btn-delete');
+  if (!deleteConfirm) {
+    deleteConfirm = true;
+    btn.textContent = '¿Eliminar?';
+    btn.classList.add('btn-danger-text');
+    setTimeout(() => {
+      if (deleteConfirm) {
+        deleteConfirm = false;
+        btn.textContent = 'Eliminar';
+        btn.classList.remove('btn-danger-text');
+      }
+    }, 3000);
+    return;
+  }
+  deleteConfirm = false;
+  btn.textContent = 'Eliminar';
+  btn.classList.remove('btn-danger-text');
+  try {
+    await api(`/api/emails/${emailActual.id}`, { method: 'DELETE' });
+    toast('Eliminado.');
     show('inbox');
     cargarBandeja();
   } catch (e) {
@@ -454,9 +650,9 @@ $('#btn-compose-ai').onclick = async () => {
 };
 
 $('#btn-compose-send').onclick = async () => {
-  const to = $('#c-to').value.trim();
+  const to   = $('#c-to').value.trim();
   const body = $('#c-body').value.trim();
-  if (!to) return toast('Escribe un destinatario');
+  if (!to)   return toast('Escribe un destinatario');
   if (!body) return toast('El correo está vacío');
   const btn = $('#btn-compose-send');
   btn.disabled = true;
@@ -479,15 +675,15 @@ $('#btn-logout').onclick = async () => {
   show('welcome');
 };
 
-// Título grande que colapsa al hacer scroll
+// Colapsar título en scroll
 window.addEventListener('scroll', () => {
   const titulo = $('#cat-title');
   if (titulo) titulo.classList.toggle('collapsed', window.scrollY > 40);
 }, { passive: true });
 
-// Atajos de teclado básicos
+// Atajos de teclado
 document.addEventListener('keydown', (e) => {
-  const tag = document.activeElement?.tagName;
+  const tag    = document.activeElement?.tagName;
   const typing = tag === 'INPUT' || tag === 'TEXTAREA';
 
   if (e.key === 'Escape') {
@@ -498,6 +694,12 @@ document.addEventListener('keydown', (e) => {
       cargarBandeja();
     } else if (!$('#composer').classList.contains('hidden')) {
       show('inbox');
+    } else if (searchActive) {
+      searchActive = false;
+      $('#search-bar').classList.add('hidden');
+      $('#btn-search').classList.remove('active');
+      $('#search-input').value = '';
+      cargarBandeja(true);
     }
   }
 
@@ -513,6 +715,10 @@ document.addEventListener('keydown', (e) => {
   try {
     const { user } = await api('/api/me');
     if (!user) return show('welcome');
+    if (user.picture) {
+      const av = $('#user-avatar');
+      if (av) { av.src = user.picture; av.classList.remove('hidden'); }
+    }
     show('inbox');
     await cargarBandeja(true);
     const { counts } = await api('/api/emails/counts');

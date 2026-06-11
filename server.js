@@ -109,10 +109,15 @@ const COLS = 'id, remitente, remitente_email, asunto, snippet, resumen, fecha, c
 
 app.get('/api/emails', requireAuth, (req, res) => {
   const { categoria } = req.query;
+  const limit  = Math.min(+(req.query.limit)  || 50, 100);
+  const offset = +(req.query.offset) || 0;
   const rows = categoria
-    ? db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? AND categoria = ? ORDER BY destacado DESC, fecha DESC`).all(req.user.id, categoria)
-    : db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? ORDER BY destacado DESC, fecha DESC`).all(req.user.id);
-  res.json({ emails: rows });
+    ? db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? AND categoria = ? ORDER BY destacado DESC, fecha DESC LIMIT ? OFFSET ?`).all(req.user.id, categoria, limit, offset)
+    : db.prepare(`SELECT ${COLS} FROM emails WHERE user_id = ? ORDER BY destacado DESC, fecha DESC LIMIT ? OFFSET ?`).all(req.user.id, limit, offset);
+  const { n: total } = categoria
+    ? db.prepare('SELECT COUNT(*) n FROM emails WHERE user_id = ? AND categoria = ?').get(req.user.id, categoria)
+    : db.prepare('SELECT COUNT(*) n FROM emails WHERE user_id = ?').get(req.user.id);
+  res.json({ emails: rows, total });
 });
 
 app.get('/api/emails/counts', requireAuth, (req, res) => {
@@ -122,11 +127,27 @@ app.get('/api/emails/counts', requireAuth, (req, res) => {
   res.json({ counts: Object.fromEntries(rows.map((r) => [r.categoria, { total: r.total, no_leidos: r.no_leidos }])) });
 });
 
+app.get('/api/emails/search', requireAuth, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (q.length < 2) return res.json({ emails: [] });
+  const like = `%${q}%`;
+  const rows = db.prepare(`
+    SELECT ${COLS} FROM emails
+    WHERE user_id = ? AND (remitente LIKE ? OR remitente_email LIKE ? OR asunto LIKE ? OR resumen LIKE ? OR snippet LIKE ?)
+    ORDER BY fecha DESC LIMIT 50`).all(req.user.id, like, like, like, like, like);
+  res.json({ emails: rows });
+});
+
 app.get('/api/emails/:id', requireAuth, (req, res) => {
   const email = db.prepare('SELECT * FROM emails WHERE id = ? AND user_id = ?')
     .get(req.params.id, req.user.id);
   if (!email) return res.status(404).json({ error: 'No encontrado' });
   res.json({ email });
+});
+
+app.delete('/api/emails/:id', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM emails WHERE id = ? AND user_id = ?').run(req.params.id, req.user.id);
+  res.json({ ok: true });
 });
 
 app.post('/api/emails/:id/leido', requireAuth, (req, res) => {
