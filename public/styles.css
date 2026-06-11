@@ -1,31 +1,31 @@
 /* ================================================================
-   SinMail — diseño minimalista, blanco puro
-   Inspirado en Spark Mail, Mimestream, Linear
+   SinMail — diseño contemplativo
+   Blanco puro, silencio visual, presencia.
    ================================================================ */
 
 /* ---- Tokens ---- */
 :root {
-  /* Fondo: blanco puro */
   --bg:         #FFFFFF;
   --bg-subtle:  #FAFAFA;
   --surface:    #FFFFFF;
 
-  /* Texto con jerarquía real */
-  --t1: #0F172A;   /* remitente, asunto no leído */
-  --t2: #334155;   /* asunto leído */
-  --t3: #64748B;   /* etiquetas, metadatos */
-  --t4: #94A3B8;   /* fechas, preview, hints */
+  /* Jerarquía de texto */
+  --t1: #0F172A;
+  --t2: #334155;
+  --t3: #64748B;
+  --t4: #94A3B8;
+  --t5: #CBD5E1;
 
-  /* Acento */
+  /* Acento principal */
   --accent:       #2563EB;
   --accent-hover: #1D4ED8;
   --accent-light: #EFF6FF;
 
   /* Líneas */
-  --line:        rgba(15, 23, 42, 0.07);
-  --line-medium: rgba(15, 23, 42, 0.12);
+  --line:        rgba(15, 23, 42, 0.06);
+  --line-medium: rgba(15, 23, 42, 0.11);
 
-  /* Indicadores de categoría */
+  /* Indicadores por categoría */
   --c-urgente:       #EF4444;
   --c-por_responder: #3B82F6;
   --c-para_leer:     #10B981;
@@ -42,18 +42,18 @@
   --chip-otros-bg:         #F5F3FF; --chip-otros-fg:         #6D28D9;
 
   /* Geometría */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 14px;
-  --r-xl: 20px;
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   14px;
+  --r-xl:   20px;
   --r-pill: 100px;
 
-  /* Animación */
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Animación contemplativa */
+  --ease:   cubic-bezier(0.22, 1, 0.36, 1);
   --spring: cubic-bezier(0.16, 1, 0.3, 1);
   --t-fast:   120ms;
-  --t-normal: 200ms;
-  --t-slow:   320ms;
+  --t-calm:   280ms;
+  --t-slow:   500ms;
 }
 
 /* ---- Reset ---- */
@@ -74,8 +74,17 @@ body {
 .hidden { display: none !important; }
 .screen { min-height: 100dvh; }
 
+/* Entrada de cada pantalla */
+.screen:not(.hidden) {
+  animation: screenFade var(--t-calm) var(--ease) both;
+}
+@keyframes screenFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ================================================================
-   Logo — squircle degradado con corte diagonal
+   Logo
    ================================================================ */
 .logo {
   position: relative;
@@ -106,7 +115,7 @@ body {
 .wm-mail { color: var(--t1); font-weight: 300; }
 
 /* ================================================================
-   Pantalla de bienvenida
+   Bienvenida — silenciosa y clara
    ================================================================ */
 #welcome {
   display: flex;
@@ -120,49 +129,59 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 320px;
+  max-width: 300px;
+  animation: welcomeIn 600ms var(--spring) both;
+  animation-delay: 80ms;
+}
+@keyframes welcomeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .wordmark-lg { margin-top: 24px; }
 .welcome-sub {
-  margin-top: 16px;
-  font-size: 20px;
+  margin-top: 20px;
+  font-size: 19px;
   font-weight: 600;
   color: var(--t1);
   letter-spacing: -0.02em;
 }
 .welcome-desc {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--t3);
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--t4);
   font-weight: 400;
+  letter-spacing: 0.01em;
 }
 .btn-google {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-top: 36px;
-  padding: 13px 24px;
+  margin-top: 40px;
+  padding: 13px 22px;
   background: var(--bg);
   border: 1px solid var(--line-medium);
   border-radius: var(--r-lg);
   font-size: 15px;
   font-weight: 500;
   color: var(--t1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-  transition: box-shadow var(--t-fast) var(--ease),
-              transform var(--t-fast) var(--ease);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.05),
+    0 2px 6px rgba(0,0,0,0.04);
+  transition:
+    box-shadow var(--t-fast) var(--ease),
+    transform   var(--t-fast) var(--ease);
 }
-.btn-google:hover  { box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
-.btn-google:active { transform: scale(0.975); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.btn-google:hover  { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+.btn-google:active { transform: scale(0.975); }
 
 /* ================================================================
-   Topbar
+   Topbar — transparente y serena
    ================================================================ */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.90);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--line);
@@ -180,7 +199,6 @@ body {
 .topbar-actions { display: flex; align-items: center; gap: 2px; }
 .topbar-title { font-size: 15px; font-weight: 600; color: var(--t1); }
 
-/* Botón ícono (SVG) */
 .icon-btn {
   display: inline-flex;
   align-items: center;
@@ -189,19 +207,18 @@ body {
   background: none;
   border: none;
   border-radius: var(--r-md);
-  color: var(--t3);
+  color: var(--t4);
   transition: background var(--t-fast), color var(--t-fast);
 }
-.icon-btn:hover  { background: var(--bg-subtle); color: var(--t1); }
+.icon-btn:hover  { background: var(--bg-subtle); color: var(--t2); }
 .icon-btn:active { background: var(--line); }
 .icon-btn.btn-star.starred { color: #D97706; }
 
-/* Botón texto en topbar */
 .topbar-text-btn {
   background: none;
   border: none;
-  padding: 6px 10px;
-  font-size: 14px;
+  padding: 6px 9px;
+  font-size: 13.5px;
   font-weight: 400;
   color: var(--accent);
   border-radius: var(--r-md);
@@ -209,24 +226,33 @@ body {
 }
 .topbar-text-btn:hover { background: var(--accent-light); }
 
-/* Botón volver */
 .topbar-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: none;
   border: none;
-  padding: 6px 8px 6px 4px;
-  font-size: 14px;
+  padding: 6px 10px 6px 4px;
+  font-size: 13.5px;
   font-weight: 400;
   color: var(--accent);
   border-radius: var(--r-md);
   transition: background var(--t-fast);
 }
 .topbar-back:hover { background: var(--accent-light); }
-.topbar-back svg { flex-shrink: 0; }
 
-/* Enviar inline */
+.btn-focus-toggle {
+  font-size: 12px;
+  color: var(--t5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-calm), color var(--t-fast), background var(--t-fast);
+}
+.btn-focus-toggle:hover { color: var(--t3); }
+#reader:hover .btn-focus-toggle,
+#reader:focus-within .btn-focus-toggle { opacity: 1; pointer-events: auto; }
+.btn-focus-toggle.active { color: var(--accent); opacity: 1; pointer-events: auto; }
+
 .btn-send-inline {
   background: var(--accent);
   border: none;
@@ -241,7 +267,7 @@ body {
 .btn-send-inline:active { transform: scale(0.97); }
 
 /* ================================================================
-   Bandeja — layout
+   Contenido principal
    ================================================================ */
 .content {
   max-width: 700px;
@@ -250,17 +276,18 @@ body {
 }
 
 .big-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--t1);
-  padding: 16px 16px 10px;
-  transition: font-size var(--t-normal) var(--ease),
-              padding var(--t-normal) var(--ease);
+  padding: 18px 16px 10px;
+  transition:
+    font-size var(--t-calm) var(--ease),
+    padding   var(--t-calm) var(--ease),
+    opacity   var(--t-calm);
 }
 .big-title.collapsed { font-size: 16px; padding: 8px 16px 6px; font-weight: 600; }
 
-/* Banner de sync */
 .sync-banner {
   margin: 0 16px 10px;
   padding: 10px 14px;
@@ -269,14 +296,15 @@ body {
   border-radius: var(--r-lg);
   font-size: 13px;
   color: var(--t3);
-  animation: fadeUp var(--t-normal) var(--ease);
+  animation: fadeUp var(--t-calm) var(--ease);
 }
 
 /* ================================================================
-   Lista de correos — edge-to-edge, blanco puro
+   Lista de correos — respiración con entrada escalonada
    ================================================================ */
 .email-list { list-style: none; }
 
+/* Entrada escalonada — primeras 8 filas */
 .email-row {
   display: flex;
   align-items: flex-start;
@@ -284,33 +312,44 @@ body {
   padding: 14px 16px 15px;
   border-bottom: 1px solid var(--line);
   cursor: pointer;
-  transition: background var(--t-fast);
   position: relative;
+  animation: rowIn var(--t-calm) var(--ease) both;
 }
 .email-row:last-child { border-bottom: none; }
 .email-row:hover  { background: #FAFBFC; }
 .email-row:active { background: #F5F7FA; }
 
-/* Punto indicador — categoría coloreada */
+.email-row:nth-child(1)  { animation-delay:   0ms; }
+.email-row:nth-child(2)  { animation-delay:  28ms; }
+.email-row:nth-child(3)  { animation-delay:  56ms; }
+.email-row:nth-child(4)  { animation-delay:  84ms; }
+.email-row:nth-child(5)  { animation-delay: 112ms; }
+.email-row:nth-child(6)  { animation-delay: 140ms; }
+.email-row:nth-child(7)  { animation-delay: 168ms; }
+.email-row:nth-child(8)  { animation-delay: 196ms; }
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Punto indicador con color de categoría */
 .dot {
-  width: 7px; height: 7px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 5px;
-  transition: opacity var(--t-fast);
+  margin-top: 6px;
+  transition: opacity var(--t-calm);
 }
 .dot.read { opacity: 0; }
-
-/* Color semántico por categoría */
 .dot.d-urgente       { background: var(--c-urgente); }
 .dot.d-por_responder { background: var(--c-por_responder); }
 .dot.d-para_leer     { background: var(--c-para_leer); }
 .dot.d-boletines     { background: var(--c-boletines); }
 .dot.d-archivo       { background: var(--c-archivo); }
 .dot.d-otros         { background: var(--c-otros); }
-.dot:not([class*="d-"]) { background: var(--accent); } /* fallback */
+.dot:not([class*="d-"]) { background: var(--accent); }
 
-/* Contenido de la fila */
 .email-main { flex: 1; min-width: 0; }
 
 .email-top {
@@ -331,16 +370,13 @@ body {
 }
 .email-date {
   font-size: 11.5px;
-  font-weight: 400;
   color: var(--t4);
   flex-shrink: 0;
-  letter-spacing: 0;
 }
-
 .email-subject {
   font-size: 13.5px;
   font-weight: 500;
-  color: var(--t1);
+  color: var(--t2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -348,12 +384,10 @@ body {
 }
 .email-subject.read {
   font-weight: 400;
-  color: var(--t3);
+  color: var(--t4);
 }
-
 .email-preview {
   font-size: 12.5px;
-  font-weight: 400;
   color: var(--t4);
   white-space: nowrap;
   overflow: hidden;
@@ -361,38 +395,45 @@ body {
   margin-top: 1px;
   line-height: 1.3;
 }
-
-/* Estrella en lista */
 .row-star {
   font-size: 11px;
   color: #D97706;
   flex-shrink: 0;
-  margin-top: 4px;
-  opacity: 0.85;
+  margin-top: 5px;
+  opacity: 0.75;
 }
 
-/* Estado vacío */
+/* ================================================================
+   Estado vacío — contemplativo
+   ================================================================ */
 .empty-state {
-  padding: 72px 24px 40px;
+  padding: 80px 24px 48px;
   text-align: center;
+  animation: emptyIn 600ms var(--spring) both;
+  animation-delay: 100ms;
 }
-.empty-icon {
-  width: 48px; height: 48px;
+@keyframes emptyIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.empty-orb {
+  width: 40px; height: 40px;
   border-radius: 50%;
-  background: var(--bg-subtle);
-  border: 1px solid var(--line);
-  margin: 0 auto 16px;
+  background: linear-gradient(135deg, var(--bg-subtle), var(--t5));
+  margin: 0 auto 20px;
+  opacity: 0.6;
 }
 .empty-title {
   font-size: 15px;
   font-weight: 500;
   color: var(--t3);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 .empty-sub {
   font-size: 13px;
-  color: var(--t4);
-  line-height: 1.5;
+  color: var(--t5);
+  line-height: 1.6;
   max-width: 220px;
   margin: 0 auto;
 }
@@ -408,22 +449,22 @@ body {
   background: linear-gradient(
     90deg,
     rgba(15,23,42,0.04) 25%,
-    rgba(15,23,42,0.08) 50%,
+    rgba(15,23,42,0.07) 50%,
     rgba(15,23,42,0.04) 75%
   );
   background-size: 300% 100%;
-  animation: shimmer 1.6s ease infinite;
+  animation: shimmer 1.8s ease infinite;
   border-radius: var(--r-sm);
   display: block;
 }
-.sk-dot     { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-.sk-from    { width: 120px; height: 12px; }
-.sk-date    { width: 32px;  height: 10px; }
-.sk-subject { width: 68%;   height: 11px; margin-top: 6px; }
-.sk-preview { width: 45%;   height: 10px; margin-top: 5px; }
+.sk-dot     { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.sk-from    { width: 110px; height: 12px; }
+.sk-date    { width: 30px;  height: 10px; }
+.sk-subject { width: 65%;   height: 11px; margin-top: 6px; }
+.sk-preview { width: 42%;   height: 10px; margin-top: 5px; }
 
 /* ================================================================
-   Píldora de navegación — premium
+   Píldora de categorías — serena y sólida
    ================================================================ */
 .pill {
   position: fixed;
@@ -434,15 +475,15 @@ body {
   align-items: center;
   gap: 2px;
   padding: 4px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.96);
   -webkit-backdrop-filter: saturate(180%) blur(24px);
   backdrop-filter: saturate(180%) blur(24px);
-  border: 1px solid rgba(15,23,42,0.09);
+  border: 1px solid rgba(15,23,42,0.08);
   border-radius: var(--r-pill);
   box-shadow:
-    0 4px 6px -1px rgba(0,0,0,0.07),
-    0 10px 32px -4px rgba(0,0,0,0.10),
-    0 0 0 0.5px rgba(255,255,255,0.8) inset;
+    0 2px 4px rgba(0,0,0,0.04),
+    0 8px 24px rgba(0,0,0,0.08),
+    0 0 0 0.5px rgba(255,255,255,0.9) inset;
   z-index: 200;
   max-width: calc(100vw - 24px);
   overflow-x: auto;
@@ -450,7 +491,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 .pill::-webkit-scrollbar { display: none; }
-
 .pill-item {
   position: relative;
   display: inline-flex;
@@ -460,18 +500,18 @@ body {
   border: none;
   padding: 7px 11px;
   border-radius: calc(var(--r-pill) - 4px);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--t3);
   white-space: nowrap;
-  transition: background var(--t-fast) var(--ease),
-              color var(--t-fast) var(--ease);
+  transition:
+    background var(--t-fast) var(--ease),
+    color     var(--t-fast) var(--ease);
   min-height: 32px;
 }
-.pill-item:hover  { background: var(--bg-subtle); color: var(--t1); }
+.pill-item:hover  { background: var(--bg-subtle); color: var(--t2); }
 .pill-item.active { background: var(--t1); color: #fff; }
 .pill-otros.active { background: #5B21B6; color: #fff; }
-
 .badge {
   position: absolute;
   top: -1px; right: 0px;
@@ -487,20 +527,20 @@ body {
   pointer-events: none;
 }
 .pill-item.active .badge,
-.pill-otros.active .badge { background: rgba(255,255,255,0.4); }
+.pill-otros.active .badge { background: rgba(255,255,255,0.38); }
 
 /* ================================================================
-   Lector — limpio y espacioso
+   Lector — espacio para la presencia
    ================================================================ */
 .reader-content { padding: 20px 16px 120px; }
 
-/* Tarjeta de resumen IA */
 .ai-card {
   background: var(--bg-subtle);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 12px 14px;
   margin-bottom: 20px;
+  transition: opacity var(--t-slow) var(--ease);
 }
 .ai-card-header {
   display: flex;
@@ -535,19 +575,19 @@ body {
 
 .ai-resumen {
   font-size: 13.5px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--t2);
 }
 .otros-hint {
   font-size: 12px;
   color: var(--t4);
   margin-top: 8px;
-  line-height: 1.45;
+  line-height: 1.5;
+  font-style: italic;
 }
 
-/* Cabecera del correo */
 .reader-subject {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.25;
@@ -564,7 +604,7 @@ body {
 .meta-from {
   display: block;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--t3);
   white-space: nowrap;
   overflow: hidden;
@@ -581,30 +621,52 @@ body {
   background: var(--line);
   margin-bottom: 20px;
 }
-
-/* Cuerpo del correo */
 .reader-body {
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: 15.5px;
+  line-height: 1.7;
   color: var(--t2);
   white-space: pre-wrap;
   word-break: break-word;
-  padding-bottom: 28px;
+  padding-bottom: 32px;
+  transition: font-size var(--t-calm) var(--ease);
+}
+
+/* Sección secundaria del lector (reclasificar + responder) */
+.reader-secondary {
+  transition: opacity var(--t-slow) var(--ease);
 }
 
 /* ================================================================
-   Secciones del lector
+   Modo enfoque — solo el correo importa
+   ================================================================ */
+.reader.focus-mode .ai-card       { opacity: 0.25; pointer-events: none; }
+.reader.focus-mode .reader-secondary { opacity: 0.12; pointer-events: none; }
+.reader.focus-mode .reader-body   { font-size: 16.5px; }
+.reader.focus-mode .topbar-actions .icon-btn,
+.reader.focus-mode .topbar-actions .topbar-text-btn:not(.btn-focus-toggle) {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.reader.focus-mode .btn-focus-toggle { color: var(--accent); opacity: 1; }
+
+/* Al interactuar, todo vuelve */
+.reader.focus-mode:hover .ai-card,
+.reader.focus-mode:hover .reader-secondary {
+  opacity: 0.7;
+  pointer-events: auto;
+}
+
+/* ================================================================
+   Secciones secundarias del lector
    ================================================================ */
 .section-label {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--t4);
+  color: var(--t5);
   margin-bottom: 10px;
 }
-
-/* Reclasificar */
 .reclassify-section {
   padding-top: 20px;
   border-top: 1px solid var(--line);
@@ -625,11 +687,10 @@ body {
   color: var(--t3);
   transition: all var(--t-fast) var(--ease);
 }
-.recat-btn:hover  { border-color: var(--t1); color: var(--t1); background: var(--bg-subtle); }
+.recat-btn:hover  { border-color: var(--t3); color: var(--t1); background: var(--bg-subtle); }
 .recat-btn:active { transform: scale(0.96); }
 .recat-btn.current { background: var(--t1); color: #fff; border-color: var(--t1); }
 
-/* Responder */
 .reply-section {
   padding-top: 20px;
   border-top: 1px solid var(--line);
@@ -638,10 +699,10 @@ body {
 /* ================================================================
    Campos y botones
    ================================================================ */
-textarea, .field, .compose-field {
+textarea, .field {
   width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line-medium);
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
   border-radius: var(--r-lg);
   padding: 11px 14px;
   font-size: 14.5px;
@@ -649,14 +710,15 @@ textarea, .field, .compose-field {
   color: var(--t1);
   resize: vertical;
   margin-bottom: 10px;
-  transition: border-color var(--t-fast), box-shadow var(--t-fast);
-  line-height: 1.5;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  line-height: 1.55;
 }
-textarea::placeholder, .compose-field::placeholder { color: var(--t4); }
-textarea:focus, .field:focus, .compose-field:focus {
+textarea::placeholder { color: var(--t5); }
+textarea:focus, .field:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+  background: var(--bg);
+  border-color: rgba(37,99,235,0.35);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
 }
 
 .btn-primary {
@@ -669,34 +731,33 @@ textarea:focus, .field:focus, .compose-field:focus {
   font-size: 14.5px;
   font-weight: 600;
   margin-bottom: 10px;
-  transition: opacity var(--t-fast), transform var(--t-fast);
   letter-spacing: -0.01em;
+  transition: opacity var(--t-fast), transform var(--t-fast);
 }
 .btn-primary:hover  { opacity: 0.88; }
 .btn-primary:active { opacity: 0.78; transform: scale(0.99); }
-.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
 .btn-primary.btn-send { background: var(--accent); }
+.btn-primary.btn-send:hover { background: var(--accent-hover); opacity: 1; }
 
 /* ================================================================
-   Redactor — layout propio
+   Redactor — sin bordes, fluido
    ================================================================ */
 .compose-content {
   max-width: 700px;
   margin: 0 auto;
-  padding: 0 0 80px;
+  padding-bottom: 80px;
 }
 .compose-field-row {
   display: flex;
   align-items: center;
-  gap: 0;
   border-bottom: 1px solid var(--line);
   padding: 0 16px;
 }
 .compose-field-label {
   font-size: 13px;
   font-weight: 500;
-  color: var(--t3);
+  color: var(--t4);
   min-width: 52px;
   padding: 14px 0;
   flex-shrink: 0;
@@ -709,8 +770,11 @@ textarea:focus, .field:focus, .compose-field:focus {
   margin-bottom: 0;
   font-size: 14.5px;
   background: transparent;
+  color: var(--t1);
+  font-family: inherit;
 }
-.compose-field:focus { box-shadow: none; }
+.compose-field:focus { outline: none; box-shadow: none; border: none; }
+.compose-field::placeholder { color: var(--t5); }
 
 .compose-ai-row {
   display: flex;
@@ -721,53 +785,54 @@ textarea:focus, .field:focus, .compose-field:focus {
 }
 .compose-ai-input {
   flex: 1;
-  border: none;
-  border-radius: 0;
-  padding: 4px 0;
-  margin-bottom: 0;
+  border: none; border-radius: 0;
+  padding: 4px 0; margin-bottom: 0;
   font-size: 14px;
   background: transparent;
+  color: var(--t1);
+  font-family: inherit;
 }
-.compose-ai-input:focus { box-shadow: none; }
+.compose-ai-input:focus { outline: none; box-shadow: none; }
+.compose-ai-input::placeholder { color: var(--t5); }
 
 .btn-ai {
-  background: var(--bg-subtle);
+  background: transparent;
   border: 1px solid var(--line-medium);
   border-radius: var(--r-md);
-  padding: 7px 13px;
-  font-size: 13px;
+  padding: 7px 12px;
+  font-size: 12.5px;
   font-weight: 500;
   color: var(--accent);
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background var(--t-fast);
+  transition: background var(--t-fast), border-color var(--t-fast);
 }
-.btn-ai:hover { background: var(--accent-light); }
+.btn-ai:hover { background: var(--accent-light); border-color: transparent; }
 
 .compose-body {
   width: 100%;
-  border: none;
-  border-radius: 0;
-  padding: 16px 16px;
-  font-size: 14.5px;
+  border: none; border-radius: 0;
+  padding: 20px 16px;
+  font-size: 15px;
   font-family: inherit;
   color: var(--t1);
   resize: none;
-  min-height: 300px;
-  line-height: 1.65;
+  min-height: 280px;
+  line-height: 1.7;
   background: transparent;
 }
 .compose-body:focus { outline: none; box-shadow: none; }
+.compose-body::placeholder { color: var(--t5); }
 
 /* ================================================================
-   Toast
+   Toast — breve, calmado
    ================================================================ */
 .toast {
   position: fixed;
   bottom: 88px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--t1);
+  background: rgba(15, 23, 42, 0.94);
   color: #fff;
   padding: 10px 18px;
   border-radius: var(--r-lg);
@@ -775,52 +840,63 @@ textarea:focus, .field:focus, .compose-field:focus {
   font-weight: 400;
   z-index: 500;
   max-width: calc(100vw - 40px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.20);
-  animation: toastIn var(--t-normal) var(--spring);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  animation: toastIn var(--t-calm) var(--spring);
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.45;
+  backdrop-filter: blur(8px);
 }
 
 /* ================================================================
-   Animación ambient — correos en "Otros"
+   Animación ambient — Otros: buscando lugar
    ================================================================ */
 @media (prefers-reduced-motion: no-preference) {
   .otros-row {
-    animation: smDrift 7s ease-in-out infinite;
+    animation:
+      rowIn     var(--t-calm)  var(--ease)        both,
+      smDrift   7s             ease-in-out infinite;
+    animation-delay: 0ms, 400ms;
     will-change: transform;
   }
-  .otros-row:nth-child(2n) { animation-duration: 8.5s; animation-delay: -2.8s; }
-  .otros-row:nth-child(3n) { animation-duration: 6.8s; animation-delay: -5.1s; }
-  .otros-row:nth-child(4n) { animation-duration: 9.2s; animation-delay: -1.4s; }
-  .otros-row:nth-child(5n) { animation-duration: 7.6s; animation-delay: -6.3s; }
+  .otros-row:nth-child(1)  { animation-delay: 0ms,   400ms; }
+  .otros-row:nth-child(2)  { animation-delay: 28ms,  2100ms; }
+  .otros-row:nth-child(3)  { animation-delay: 56ms,  3800ms; }
+  .otros-row:nth-child(4)  { animation-delay: 84ms,  1300ms; }
+  .otros-row:nth-child(5)  { animation-delay: 112ms, 5200ms; }
+  .otros-row:nth-child(6)  { animation-delay: 140ms, 700ms;  }
+  .otros-row:nth-child(7)  { animation-delay: 168ms, 4100ms; }
+  .otros-row:nth-child(8)  { animation-delay: 196ms, 2600ms; }
+
   .otros-row:hover,
   .otros-row:focus,
-  .otros-row:active { animation: none; transform: none; }
+  .otros-row:active {
+    animation: none;
+    transform: translateY(0) rotate(0deg);
+  }
 }
 @keyframes smDrift {
-  0%,  100% { transform: translateY(0px)     rotate(0deg);     }
-  30%        { transform: translateY(-1.5px)  rotate(0.12deg);  }
-  65%        { transform: translateY(0.9px)   rotate(-0.08deg); }
+  0%,  100% { transform: translateY(0px)    rotate(0deg);    }
+  30%        { transform: translateY(-1.5px) rotate(0.11deg); }
+  65%        { transform: translateY(0.8px)  rotate(-0.07deg); }
 }
 
 /* ================================================================
-   Keyframes
+   Keyframes generales
    ================================================================ */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.96); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1); }
+  from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1); }
 }
 
 /* ================================================================
    Desktop
    ================================================================ */
 @media (min-width: 700px) {
-  .big-title { padding: 20px 20px 12px; }
-
+  .big-title { padding: 22px 20px 12px; }
   .email-list {
     margin: 0 16px;
     border: 1px solid var(--line);
@@ -829,9 +905,8 @@ textarea:focus, .field:focus, .compose-field:focus {
   }
   .email-row { padding: 15px 20px 16px; }
   .email-row:last-child { border-bottom: none; }
-
-  .reader-content { padding: 24px 24px 120px; }
-
+  .reader-content { padding: 28px 28px 120px; }
+  .reader-body { font-size: 16px; }
   .pill { bottom: 28px; }
 }
 

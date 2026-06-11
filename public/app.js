@@ -10,14 +10,25 @@ const NOMBRES = {
   otros:         'Otros',
 };
 
-const EMPTY_SUBS = {
-  urgente:       'No hay correos urgentes en este momento.',
-  por_responder: 'No hay correos esperando tu respuesta.',
-  para_leer:     'No hay contenido nuevo para leer.',
-  boletines:     'Sin boletines.',
-  archivo:       'El archivo está vacío.',
-  otros:         'Los correos ambiguos o inusuales aparecen aquí para que decidas dónde van.',
+const EMPTY_TITLES = {
+  urgente:       'Todo en calma.',
+  por_responder: 'Nada pendiente.',
+  para_leer:     'La bandeja respira.',
+  boletines:     'Sin novedades.',
+  archivo:       'El archivo descansa.',
+  otros:         'Sin incertidumbre.',
 };
+
+const EMPTY_SUBS = {
+  urgente:       'Nada requiere tu atención inmediata.',
+  por_responder: 'No hay mensajes esperando respuesta.',
+  para_leer:     'No hay nada nuevo para leer.',
+  boletines:     'Sin boletines por ahora.',
+  archivo:       'El archivo está en orden.',
+  otros:         'No hay nada esperando una categoría.',
+};
+
+const FRASES_ARCHIVO = ['Cerrado.', 'Resuelto.', 'Guardado.', 'Ciclo completado.', 'Todo en su lugar.'];
 
 let categoriaActual = 'urgente';
 let emailActual = null;
@@ -114,9 +125,7 @@ async function cargarBandeja(mostrarSkeleton = false) {
   const empty = $('#empty-state');
   if (emails.length === 0) {
     empty.classList.remove('hidden');
-    $('#empty-title').textContent = NOMBRES[categoriaActual] === 'Otros'
-      ? 'Sin correos sin clasificar'
-      : `Sin correos en ${NOMBRES[categoriaActual]}`;
+    $('#empty-title').textContent = EMPTY_TITLES[categoriaActual] || 'Nada por aquí';
     $('#empty-sub').textContent = EMPTY_SUBS[categoriaActual] || '';
   } else {
     empty.classList.add('hidden');
@@ -152,7 +161,7 @@ async function cargarBandeja(mostrarSkeleton = false) {
 async function sincronizar() {
   const banner = $('#sync-banner');
   banner.classList.remove('hidden');
-  banner.textContent = 'Sincronizando con Gmail…';
+  banner.textContent = 'Buscando correos nuevos…';
   try {
     await api('/api/sync', { method: 'POST' });
     const poll = setInterval(async () => {
@@ -166,13 +175,17 @@ async function sincronizar() {
         }
         if (st.running) {
           banner.textContent = st.total
-            ? `Clasificando con IA… ${st.done}/${st.total}`
-            : 'Sincronizando con Gmail…';
+            ? `Clasificando… ${st.done}/${st.total}`
+            : 'Buscando correos nuevos…';
           if (st.done > 0 && st.done % 5 === 0) cargarBandeja();
         } else {
           clearInterval(poll);
           banner.classList.add('hidden');
-          if (st.total > 0) toast(`${st.total} correo${st.total > 1 ? 's' : ''} nuevo${st.total > 1 ? 's' : ''} clasificado${st.total > 1 ? 's' : ''}`);
+          if (st.total > 0) {
+            toast(`${st.total} correo${st.total > 1 ? 's' : ''} nuevo${st.total > 1 ? 's' : ''}.`);
+          } else {
+            toast('Tu bandeja está al día.');
+          }
           cargarBandeja();
         }
       } catch {
@@ -320,7 +333,18 @@ document.querySelectorAll('.pill-item').forEach((btn) => {
 });
 
 $('#btn-refresh').onclick = sincronizar;
-$('#btn-back').onclick = () => { show('inbox'); cargarBandeja(); };
+$('#btn-back').onclick = () => {
+  $('#reader').classList.remove('focus-mode');
+  $('#btn-focus').classList.remove('active');
+  show('inbox');
+  cargarBandeja();
+};
+
+$('#btn-focus').onclick = () => {
+  const reader = $('#reader');
+  const active = reader.classList.toggle('focus-mode');
+  $('#btn-focus').classList.toggle('active', active);
+};
 
 // ---------- eventos del lector ----------
 $('#btn-destacar').onclick = async () => {
@@ -353,7 +377,8 @@ $('#btn-toggle-read').onclick = async () => {
 $('#btn-archive').onclick = async () => {
   try {
     await api(`/api/emails/${emailActual.id}/archivar`, { method: 'POST' });
-    toast('Movido a Archivo');
+    const frase = FRASES_ARCHIVO[Math.floor(Math.random() * FRASES_ARCHIVO.length)];
+    toast(frase);
     show('inbox');
     cargarBandeja();
   } catch (e) {
@@ -462,13 +487,24 @@ window.addEventListener('scroll', () => {
 
 // Atajos de teclado básicos
 document.addEventListener('keydown', (e) => {
+  const tag = document.activeElement?.tagName;
+  const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+
   if (e.key === 'Escape') {
     if (!$('#reader').classList.contains('hidden')) {
+      $('#reader').classList.remove('focus-mode');
+      $('#btn-focus').classList.remove('active');
       show('inbox');
       cargarBandeja();
     } else if (!$('#composer').classList.contains('hidden')) {
       show('inbox');
     }
+  }
+
+  if ((e.key === 'f' || e.key === 'F') && !typing && !$('#reader').classList.contains('hidden')) {
+    const reader = $('#reader');
+    const active = reader.classList.toggle('focus-mode');
+    $('#btn-focus').classList.toggle('active', active);
   }
 });
 
