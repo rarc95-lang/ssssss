@@ -22,6 +22,7 @@ jobs:
           mkdir -p _site
           cp sinmail.html _site/index.html
           cp logos.html _site/logos.html
+          cp sw.js manifest.webmanifest icon-180.png icon-192.png icon-512.png _site/
           touch _site/.nojekyll
       - name: Publicar en gh-pages
         run: |

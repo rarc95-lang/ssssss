@@ -9,7 +9,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="SinMail">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%234f6ef7'/%3E%3Cpath d='M9.5 19 16 13 22.5 19' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%236f83f0'/%3E%3Cpath d='M9.5 19 16 13 22.5 19' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <script>
 /* Si el script principal falla (navegador antiguo, visor restringido), muestra el error
    en pantalla en lugar de dejar los botones sin respuesta. ES5 a propósito. */
@@ -39,11 +41,11 @@ window.addEventListener('error', function(ev){
   --ink:#19233a; --ink-2:#3a4a60; --muted:#697587; --subtle:#9aa6ba;
   --line:#e7ecf6; --line-strong:#d4dcec;
   --navy:#1e40af; --blue:#2563eb; --blue-soft:#eaf1ff;
-  --indigo:#4f46e5; --brand-grad:linear-gradient(135deg,#5bb0ff 0%,#4f6ef7 100%);
-  --danger:#e11d48; --danger-soft:#fff0f3; --success:#15a34a; --success-soft:#e9fbf0;
-  --warning:#d97706; --warning-soft:#fff6e9; --violet:#7c3aed; --violet-soft:#f1ecfe;
-  --c-urgente:#f04438; --c-por_responder:#3b82f6; --c-para_leer:#16a34a;
-  --c-boletines:#f59e0b; --c-archivo:#9aa6ba; --c-otros:#8b5cf6; --c-papelera:#9aa6ba;
+  --indigo:#6c7ff2; --brand-grad:linear-gradient(135deg,#8abdff 0%,#6f83f0 100%);
+  --danger:#d65d5d; --danger-soft:#fdf1f0; --success:#3f9d72; --success-soft:#ecf9f2;
+  --warning:#cf9244; --warning-soft:#fdf6ec; --violet:#9379e0; --violet-soft:#f4f0fd;
+  --c-urgente:#f09289; --c-por_responder:#8db4f5; --c-para_leer:#82c9a5;
+  --c-boletines:#f0c585; --c-archivo:#c6cfdd; --c-otros:#bda9ec; --c-papelera:#c6cfdd;
   --radius:12px; --ease:cubic-bezier(.2,.8,.2,1);
   --shadow-sm:0 1px 2px rgba(30,64,175,.05);
   --shadow:0 18px 50px rgba(30,64,175,.10);
@@ -52,7 +54,7 @@ window.addEventListener('error', function(ev){
 html{background:var(--bg)}
 body{
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:radial-gradient(1100px 560px at 50% -8%, #e4edff 0%, rgba(228,237,255,0) 58%), var(--bg);
+  background:radial-gradient(1100px 560px at 50% -8%, #e9f0ff 0%, rgba(233,240,255,0) 58%), var(--bg);
   background-attachment:fixed;
   color:var(--ink); font-size:15px; line-height:1.5;
   letter-spacing:-.006em; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
@@ -206,11 +208,11 @@ button{cursor:pointer;background:none;border:none}
 .pill-btn{position:relative;min-height:36px;padding:8px 11px;border-radius:8px;font-size:11px;font-weight:550;
   color:var(--muted);white-space:nowrap;flex-shrink:0}
 .pill-btn:hover{background:var(--surface-2);color:var(--ink)}
-.pill-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.28)}
+.pill-btn.active{background:var(--ic-soft,#eaf1ff);color:var(--ink);font-weight:650;box-shadow:inset 0 0 0 1px var(--ic,#8db4f5)}
 .badge{position:absolute;top:3px;right:3px;min-width:13px;height:13px;padding:0 3px;
   background:#e9eef5;color:var(--ink-2);border:1px solid #fff;border-radius:99px;
   font-size:8px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1}
-.pill-btn.active .badge{background:#fff;color:var(--navy)}
+.pill-btn.active .badge{background:#fff;color:var(--ic,var(--blue))}
 .badge.hidden{display:none}
 /* Riel de intenciones: elementos visibles solo en la barra lateral de escritorio */
 .rail-top,.rail-section{display:none}
@@ -218,13 +220,13 @@ button{cursor:pointer;background:none;border:none}
 .pill .full{display:none}.pill .short{display:inline}
 .rail-intentions{display:contents}
 /* Codificación de color por intención (la usa la barra lateral) */
-.pill-btn[data-cat=urgente]{--ic:#f04438;--ic-soft:#fff1f0}
-.pill-btn[data-cat=por_responder]{--ic:#3b82f6;--ic-soft:#eef4ff}
-.pill-btn[data-cat=para_leer]{--ic:#16a34a;--ic-soft:#eafaf0}
-.pill-btn[data-cat=boletines]{--ic:#f59e0b;--ic-soft:#fff6e9}
-.pill-btn[data-cat=archivo]{--ic:#94a3b8;--ic-soft:#eef1f7}
-.pill-btn[data-cat=otros]{--ic:#8b5cf6;--ic-soft:#f3eefe}
-.pill-btn[data-cat=papelera]{--ic:#94a3b8;--ic-soft:#eef1f7}
+.pill-btn[data-cat=urgente]{--ic:#e07b71;--ic-soft:#fcefed}
+.pill-btn[data-cat=por_responder]{--ic:#6f9ae8;--ic-soft:#eef4fd}
+.pill-btn[data-cat=para_leer]{--ic:#5fb389;--ic-soft:#edf8f2}
+.pill-btn[data-cat=boletines]{--ic:#d9a456;--ic-soft:#fdf6ec}
+.pill-btn[data-cat=archivo]{--ic:#9fabc0;--ic-soft:#f0f3f8}
+.pill-btn[data-cat=otros]{--ic:#a18ade;--ic-soft:#f4f0fd}
+.pill-btn[data-cat=papelera]{--ic:#9fabc0;--ic-soft:#f0f3f8}
 
 /* ── Lector ──────────────────────────────────────────────────────────────── */
 .reader-content{max-width:760px;margin:0 auto;padding:28px 24px 120px}
@@ -339,10 +341,18 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
 .menu-item small{color:var(--subtle)}
 .menu-item.danger{color:var(--danger)}
 
+/* Móvil/tablet: solo 5 intenciones en la barra; Archivo y Papelera van al menú */
+@media(max-width:1079px){
+  .pill-btn[data-cat=archivo],.pill-btn[data-cat=papelera]{display:none}
+}
+@media(min-width:1080px){
+  .menu-mobile-only{display:none}
+}
+
 /* ── Toast ───────────────────────────────────────────────────────────────── */
 .toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:500;display:none;
   align-items:center;gap:10px;max-width:calc(100vw - 40px);padding:10px 14px;border-radius:10px;
-  background:var(--navy);color:#fff;font-size:12.5px;text-align:center;box-shadow:0 12px 30px rgba(16,24,40,.18)}
+  background:#2e3b55;color:#fff;font-size:12.5px;text-align:center;box-shadow:0 12px 30px rgba(46,59,85,.22)}
 .toast.show{display:flex}
 .toast-undo{flex-shrink:0;background:rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;
   color:#fff;font-size:12px;font-weight:600}
@@ -426,8 +436,8 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
 <!-- Definiciones SVG compartidas (degradado de marca) -->
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
   <linearGradient id="sinmail-grad" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#5bb0ff"/>
-    <stop offset="1" stop-color="#4f6ef7"/>
+    <stop offset="0" stop-color="#8abdff"/>
+    <stop offset="1" stop-color="#6f83f0"/>
   </linearGradient>
 </defs></svg>
 
@@ -656,9 +666,10 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <button class="snooze-btn" onclick="aplicarSnooze('Esta tarde')"><span class="snooze-ico">17</span><span>Esta tarde</span><span class="snooze-time">Hoy 17:00</span></button>
-    <button class="snooze-btn" onclick="aplicarSnooze('Mañana por la mañana')"><span class="snooze-ico">09</span><span>Mañana por la mañana</span><span class="snooze-time">Mañana 09:00</span></button>
-    <button class="snooze-btn" onclick="aplicarSnooze('La próxima semana')"><span class="snooze-ico">L</span><span>La próxima semana</span><span class="snooze-time">Lun 09:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('tarde')"><span class="snooze-ico">17</span><span>Esta tarde</span><span class="snooze-time">Hoy 17:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('manana')"><span class="snooze-ico">09</span><span>Mañana por la mañana</span><span class="snooze-time">Mañana 09:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('semana')"><span class="snooze-ico">L</span><span>La próxima semana</span><span class="snooze-time">Lun 09:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('demo')"><span class="snooze-ico">1'</span><span>En un minuto</span><span class="snooze-time">Demo</span></button>
   </div>
 </div>
 
@@ -668,6 +679,8 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     <div class="profile-head"><span class="avatar" id="profile-ini">RR</span><div><div class="profile-title" id="profile-name">Rodolfo Ramírez</div><div class="profile-sub" id="profile-account">rodolfo@sinmail.app</div></div></div>
     <div class="menu-sep"></div>
     <button class="menu-item" onclick="switchAccount()"><span>Cambiar cuenta</span><small id="switch-hint">SinMail · Google</small></button>
+    <button class="menu-item menu-mobile-only" onclick="irCategoria('archivo')"><span>Archivo</span><small>Sin urgencia</small></button>
+    <button class="menu-item menu-mobile-only" onclick="irCategoria('papelera')"><span>Papelera</span><small>30 días</small></button>
     <button class="menu-item" onclick="abrirReglas()"><span>Reglas de clasificación</span><small id="rules-count">2</small></button>
     <button class="menu-item" onclick="toast_show('Las preferencias de privacidad e IA estarán disponibles en la versión conectada.')"><span>Privacidad e IA</span><small>Control</small></button>
     <div class="menu-sep"></div>
@@ -822,7 +835,7 @@ const FRASES = ['Cerrado.','Resuelto.','Guardado.','Ciclo completado.','Todo en 
 function guardar(){
   try{
     const overrides = {};
-    EMAILS.forEach(e => { overrides[e.id] = {cat:e.cat, leido:e.leido, destacado:e.destacado}; });
+    EMAILS.forEach(e => { overrides[e.id] = {cat:e.cat, leido:e.leido, destacado:e.destacado, snooze_until:e.snooze_until||null, snooze_cat:e.snooze_cat||null}; });
     localStorage.setItem(STORE_KEY, JSON.stringify({overrides, rules:RULES, provider:activeProvider}));
   }catch(_){ /* almacenamiento no disponible: el demo sigue en memoria */ }
 }
@@ -831,7 +844,7 @@ function cargar(){
     const raw = localStorage.getItem(STORE_KEY);
     if(!raw) return;
     const s = JSON.parse(raw);
-    if(s.overrides) EMAILS.forEach(e => { const o = s.overrides[e.id]; if(o){ e.cat=o.cat; e.leido=o.leido; e.destacado=o.destacado; } });
+    if(s.overrides) EMAILS.forEach(e => { const o = s.overrides[e.id]; if(o){ e.cat=o.cat; e.leido=o.leido; e.destacado=o.destacado; if(o.snooze_until){ e.snooze_until=o.snooze_until; e.snooze_cat=o.snooze_cat||o.cat; } } });
     if(Array.isArray(s.rules)) RULES = s.rules;
     if(s.provider) activeProvider = s.provider;
   }catch(_){ /* estado corrupto: usar semilla */ }
@@ -879,6 +892,10 @@ function switchAccount(){
   toast_show(`Cuenta activa: ${datosCuenta().mail}`);
 }
 function cerrarSesion(){ document.getElementById('account-menu').classList.add('hidden'); ir('welcome'); }
+function irCategoria(cat){
+  document.getElementById('account-menu').classList.add('hidden');
+  cambiarCat(cat, document.querySelector('.pill-btn[data-cat="'+cat+'"]'));
+}
 
 /* ── Navegación entre pantallas ──────────────────────────────────────────── */
 function ir(id){
@@ -947,9 +964,9 @@ function aplicarIntencion(){
 function renderBandeja(filtro){
   let emails;
   if(searchMode && filtro){
-    emails = [...EMAILS]; // la búsqueda atraviesa todas las intenciones
+    emails = EMAILS.filter(e => !esSnoozed(e)); // la búsqueda atraviesa todas las intenciones
   } else {
-    emails = EMAILS.filter(e => e.cat === catActual);
+    emails = EMAILS.filter(e => e.cat === catActual && !esSnoozed(e));
   }
 
   // Agrupar por hilo: mostrar solo el mensaje más reciente (excepto en papelera)
@@ -1030,7 +1047,7 @@ function actualizarBadges(){
   ORDEN.forEach((cat,i) => {
     const btn = btns[i]; if(!btn) return;
     const badge = btn.querySelector('.badge');
-    const unread = EMAILS.filter(e => e.cat===cat && !e.leido).length;
+    const unread = EMAILS.filter(e => e.cat===cat && !e.leido && !esSnoozed(e)).length;
     if(unread > 0){ badge.textContent = unread; badge.classList.remove('hidden'); }
     else badge.classList.add('hidden');
   });
@@ -1216,10 +1233,47 @@ function cerrarSnooze(){ document.getElementById('snooze-modal').classList.add('
 function aplicarSnooze(cuando){
   cerrarSnooze();
   if(!emailActual) return;
-  emailActual.cat='archivo'; emailActual.leido=true; guardar();
-  toast_show(`Te lo recordaré: ${cuando.toLowerCase()}.`);
+  const hasta = fechaSnooze(cuando);
+  emailActual.snooze_until = hasta.getTime();
+  emailActual.snooze_cat = emailActual.cat;
+  guardar();
+  toast_show(`Volverá ${etiquetaSnooze(cuando, hasta)}.`);
   ir('inbox'); renderBandeja();
 }
+function fechaSnooze(opcion){
+  const n = new Date();
+  if(opcion==='tarde'){ const d=new Date(n); d.setHours(17,0,0,0); if(d<=n) d.setTime(n.getTime()+3*3600e3); return d; }
+  if(opcion==='manana'){ const d=new Date(n); d.setDate(d.getDate()+1); d.setHours(9,0,0,0); return d; }
+  if(opcion==='semana'){ const d=new Date(n); d.setDate(d.getDate()+(((8-d.getDay())%7)||7)); d.setHours(9,0,0,0); return d; }
+  return new Date(n.getTime()+60e3); // demo: 1 minuto
+}
+function etiquetaSnooze(opcion, d){
+  if(opcion==='tarde') return 'esta tarde a las '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+  if(opcion==='manana') return 'mañana a las 09:00';
+  if(opcion==='semana') return 'el lunes a las 09:00';
+  return 'en un minuto';
+}
+function esSnoozed(e){ return !!e.snooze_until && e.snooze_until > Date.now(); }
+function revisarSnoozes(ahora){
+  const t = ahora || Date.now();
+  const vueltos = [];
+  EMAILS.forEach(e => {
+    if(e.snooze_until && e.snooze_until <= t){
+      e.cat = e.snooze_cat || e.cat;
+      delete e.snooze_until; delete e.snooze_cat;
+      e.leido = false;
+      vueltos.push(e);
+    }
+  });
+  if(vueltos.length){
+    guardar();
+    if(document.getElementById('inbox').classList.contains('active')) renderBandeja();
+    else actualizarBadges();
+    toast_show(vueltos.length===1 ? `Ha vuelto: ${vueltos[0].asunto}` : `Han vuelto ${vueltos.length} correos pospuestos.`);
+  }
+}
+setInterval(()=>revisarSnoozes(), 30e3);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) revisarSnoozes(); });
 
 /* ── Responder / redactar con IA (simulado) ──────────────────────────────── */
 function generarBorrador(){
@@ -1353,18 +1407,18 @@ function toastWithUndo(msg, onUndo){
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
-/* ── PWA mínima (manifest embebido) ──────────────────────────────────────── */
+/* ── PWA: service worker para uso sin conexión (solo si se sirve por https) ─ */
 try{
-  const manifest = {name:'SinMail', short_name:'SinMail', start_url:'.', display:'standalone',
-    background_color:'#ffffff', theme_color:'#ffffff', description:'Un mail, sin el caos.', icons:[]};
-  const url = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'}));
-  const link = document.createElement('link'); link.rel='manifest'; link.href=url; document.head.appendChild(link);
+  if('serviceWorker' in navigator && location.protocol==='https:'){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
 }catch(_){}
 window.addEventListener('online', ()=>{ document.getElementById('sync-status').textContent='Con conexión'; });
 window.addEventListener('offline', ()=>{ document.getElementById('sync-status').textContent='Sin conexión'; toast_show('Sin conexión. Tus cambios se conservan.'); });
 
 /* ── Inicializar ─────────────────────────────────────────────────────────── */
 cargar();
+revisarSnoozes();
 aplicarCuenta();
 renderBandeja();
 </script>
