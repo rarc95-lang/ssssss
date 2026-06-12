@@ -1,0 +1,17 @@
+{
+  "name": "SinMail",
+  "short_name": "sinmail",
+  "description": "Un mail, sin el caos.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Redactar", "url": "/?compose=1", "description": "Redactar nuevo correo" }
+  ]
+}
