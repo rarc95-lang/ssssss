@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SinMail · 10 propuestas de logo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f3f6fd; --surface:#fff; --ink:#19233a; --muted:#697587; --subtle:#9aa6ba;
+    --line:#e7ecf6; --blue:#2563eb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);
+    background:radial-gradient(1100px 560px at 50% -8%,#e4edff 0%,rgba(228,237,255,0) 58%),var(--bg);
+    -webkit-font-smoothing:antialiased;padding:40px 24px 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+  header{margin-bottom:30px;max-width:720px}
+  .kicker{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--blue);text-transform:uppercase}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:10px 0 8px}
+  .lead{font-size:14.5px;line-height:1.6;color:var(--muted)}
+  .lead b{color:var(--ink);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 20px 18px;
+    box-shadow:0 10px 30px rgba(30,64,175,.06);display:flex;flex-direction:column}
+  .num{font-size:11px;font-weight:700;color:var(--subtle);letter-spacing:.04em}
+  .hero{display:flex;align-items:center;gap:14px;margin:14px 0 16px;min-height:80px}
+  .hero svg{flex-shrink:0}
+  .lockup{font-size:26px;font-weight:700;letter-spacing:-.035em;line-height:1}
+  .lockup .s{color:var(--blue)}.lockup .m{color:var(--ink);font-weight:400}
+  .name{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .concept{font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:4px;min-height:38px}
+  .tests{display:flex;align-items:center;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .test{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .test .lbl{font-size:9px;font-weight:600;color:var(--subtle);letter-spacing:.04em;text-transform:uppercase}
+  .chip-dark{background:#101830;border-radius:9px;width:42px;height:42px;display:grid;place-items:center}
+  .chip-light{background:#fff;border:1px solid var(--line);border-radius:9px;width:42px;height:42px;display:grid;place-items:center}
+  .fav{width:42px;height:42px;display:grid;place-items:center;background:#f5f8fe;border-radius:9px}
+  footer{margin-top:34px;font-size:12px;color:var(--subtle);line-height:1.6;max-width:760px}
+  @media(max-width:560px){h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Identidad de marca</p>
+    <h1>SinMail · 10 propuestas de logo</h1>
+    <p class="lead">Diez direcciones para el isotipo, todas ancladas al concepto: <b>un mail, sin el caos</b> — el correo organizado por intención. Cada una se prueba como pide tu guía de marca: a tamaño <b>favicon (≈18&nbsp;px)</b>, en <b>monocromo</b> y en <b>negativo</b> sobre fondo oscuro. El azul es el color de marca; algunas admiten variante cálida. Todas son SVG nítidos y escalables.</p>
+  </header>
+
+  <!-- Definiciones de degradado compartidas -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="g-blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5bb0ff"/><stop offset="1" stop-color="#4f6ef7"/></linearGradient>
+    <linearGradient id="g-warm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc24b"/><stop offset="1" stop-color="#ff7a59"/></linearGradient>
+    <linearGradient id="g-mint" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4ad6a8"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+  </defs></svg>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    Lectura recomendada: prioriza <b>simplicidad, memorabilidad y relevancia</b>. Las nº&nbsp;1, 4, 7 y 10 son las más sólidas a 16&nbsp;px y en una sola tinta; las de sobre (2, 3, 9) son las más literales; la nº&nbsp;8 es la variante cálida. Dime el número que prefieras y lo dejo aplicado en <code>sinmail.html</code> (o combino dos).
+  </footer>
+</div>
+
+<script>
+// Cada propuesta dibuja su marca con (primary, detail). viewBox 0 0 64 64.
+const LOGOS = [
+  { name:'Sin (∅)', grad:'g-blue',
+    concept:'Círculo con la diagonal “sin”. El símbolo de “sin / sin caos”. La marca actual, depurada.',
+    draw:(p,d)=>`<circle cx="32" cy="32" r="22" fill="${p}"/><path d="M20 44 44 20" stroke="${d}" stroke-width="5" stroke-linecap="round"/>` },
+
+  { name:'Sobre tachado', grad:'g-blue',
+    concept:'Un sobre cruzado por la diagonal: literalmente “el mail, sin el ruido”.',
+    draw:(p,d)=>`<rect x="13" y="20" width="38" height="24" rx="5" fill="none" stroke="${p}" stroke-width="3.4"/><path d="M14 23 32 35 50 23" fill="none" stroke="${p}" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M17 47 47 17" stroke="${p}" stroke-width="3.4" stroke-linecap="round"/>` },
+
+  { name:'Menos', grad:'g-blue',
+    concept:'Sobre cuya solapa es un solo trazo (un “menos”). Menos ruido, más presencia.',
+    draw:(p,d)=>`<rect x="13" y="20" width="38" height="24" rx="5" fill="none" stroke="${p}" stroke-width="3.4"/><path d="M22 32 42 32" stroke="${p}" stroke-width="3.4" stroke-linecap="round"/>` },
+
+  { name:'Presencia', grad:'g-blue',
+    concept:'Un anillo en calma con un punto central: una sola cosa, plena atención.',
+    draw:(p,d)=>`<circle cx="32" cy="32" r="21" fill="none" stroke="${p}" stroke-width="4"/><circle cx="32" cy="32" r="5.5" fill="${p}"/>` },
+
+  { name:'Intención (avión)', grad:'g-blue',
+    concept:'Avión de papel reducido al mínimo: el mensaje que eliges enviar.',
+    draw:(p,d)=>`<path d="M57 11 7 31 27 37 31 55 39 35 57 11Z" fill="${p}"/><path d="M57 11 27 37" stroke="${d}" stroke-width="2" stroke-linecap="round" opacity=".9"/>` },
+
+  { name:'Monograma S', grad:'g-blue',
+    concept:'Inicial en tile redondeado. Marca tipográfica, fuerte como favicon de app.',
+    draw:(p,d)=>`<rect x="10" y="10" width="44" height="44" rx="13" fill="${p}"/><text x="32" y="34" text-anchor="middle" dominant-baseline="central" font-family="Inter,sans-serif" font-weight="800" font-size="30" fill="${d}">S</text>` },
+
+  { name:'Sobre sereno', grad:'g-blue',
+    concept:'La solapa del sobre (∧) dentro de un círculo en calma. Mail + presencia.',
+    draw:(p,d)=>`<circle cx="32" cy="32" r="22" fill="${p}"/><path d="M20 37 32 27 44 37" fill="none" stroke="${d}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>` },
+
+  { name:'Horizonte (cálido)', grad:'g-warm',
+    concept:'Amanecer sobre el horizonte: serenidad y optimismo. La opción cálida.',
+    draw:(p,d)=>`<circle cx="32" cy="32" r="22" fill="${p}"/><circle cx="32" cy="33" r="7" fill="none" stroke="${d}" stroke-width="3.4"/><path d="M15 40 49 40" stroke="${d}" stroke-width="3.6" stroke-linecap="round"/>` },
+
+  { name:'Sobre en negativo', grad:'g-blue',
+    concept:'Tile de app con el sobre en espacio negativo. Moderno e inconfundible.',
+    draw:(p,d)=>`<rect x="9" y="9" width="46" height="46" rx="14" fill="${p}"/><rect x="18" y="23" width="28" height="19" rx="3" fill="none" stroke="${d}" stroke-width="2.6"/><path d="M19 24.5 32 35 45 24.5" fill="none" stroke="${d}" stroke-width="2.6" stroke-linejoin="round"/>` },
+
+  { name:'Foco', grad:'g-blue',
+    concept:'Diana concéntrica: elige una intención y el resto descansa al fondo.',
+    draw:(p,d)=>`<circle cx="32" cy="32" r="21" fill="none" stroke="${p}" stroke-width="3.4"/><circle cx="32" cy="32" r="12" fill="none" stroke="${p}" stroke-width="3.4"/><circle cx="32" cy="32" r="4.5" fill="${p}"/>` },
+];
+
+const svg = (inner, size) => `<svg width="${size}" height="${size}" viewBox="0 0 64 64" role="img">${inner}</svg>`;
+const grid = document.getElementById('grid');
+
+LOGOS.forEach((logo, i) => {
+  const colorPaint = `url(#${logo.grad})`;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="num">${String(i+1).padStart(2,'0')} / 10</span>
+    <div class="hero">
+      ${svg(logo.draw(colorPaint, '#fff'), 64)}
+      <span class="lockup"><span class="s">sin</span><span class="m">mail</span></span>
+    </div>
+    <div class="name">${logo.name}</div>
+    <div class="concept">${logo.concept}</div>
+    <div class="tests">
+      <div class="test"><div class="fav">${svg(logo.draw(colorPaint, '#fff'), 22)}</div><span class="lbl">18px</span></div>
+      <div class="test"><div class="chip-light">${svg(logo.draw('#19233a', '#ffffff'), 28)}</div><span class="lbl">Mono</span></div>
+      <div class="test"><div class="chip-dark">${svg(logo.draw('#ffffff', '#101830'), 28)}</div><span class="lbl">Negativo</span></div>
+    </div>`;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

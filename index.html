@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SinMail — Un mail, sin el caos</title>
+<meta name="description" content="SinMail: correo por intención. Menos ruido, más presencia.">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SinMail">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%236f83f0'/%3E%3Cpath d='M9.5 19 16 13 22.5 19' fill='none' stroke='white' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script>
+/* Si el script principal falla (navegador antiguo, visor restringido), muestra el error
+   en pantalla en lugar de dejar los botones sin respuesta. ES5 a propósito. */
+window.addEventListener('error', function(ev){
+  try{
+    var el = document.getElementById('boot-error');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'boot-error';
+      el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#9f1239;color:#fff;font:12.5px/1.5 -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;padding:11px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);text-align:center';
+      (document.body || document.documentElement).appendChild(el);
+    }
+    el.textContent = 'SinMail no pudo iniciarse: ' + (ev.message || 'error de script') + (ev.lineno ? ' (línea ' + ev.lineno + ')' : '') + '. Prueba con un navegador actualizado (Chrome, Safari o Edge).';
+  }catch(_){}
+});
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;650;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SINMAIL · SISTEMA DE DISEÑO
+   Dirección visual institucional y serena. Una sola fuente de verdad.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#f3f6fd; --surface:#ffffff; --surface-2:#f5f8fe;
+  --ink:#19233a; --ink-2:#3a4a60; --muted:#697587; --subtle:#9aa6ba;
+  --line:#e7ecf6; --line-strong:#d4dcec;
+  --navy:#1e40af; --blue:#2563eb; --blue-soft:#eaf1ff;
+  --indigo:#6c7ff2; --brand-grad:linear-gradient(135deg,#8abdff 0%,#6f83f0 100%);
+  --danger:#d65d5d; --danger-soft:#fdf1f0; --success:#3f9d72; --success-soft:#ecf9f2;
+  --warning:#cf9244; --warning-soft:#fdf6ec; --violet:#9379e0; --violet-soft:#f4f0fd;
+  --c-urgente:#f09289; --c-por_responder:#8db4f5; --c-para_leer:#82c9a5;
+  --c-boletines:#f0c585; --c-archivo:#c6cfdd; --c-otros:#bda9ec; --c-papelera:#c6cfdd;
+  --radius:12px; --ease:cubic-bezier(.2,.8,.2,1);
+  --shadow-sm:0 1px 2px rgba(30,64,175,.05);
+  --shadow:0 18px 50px rgba(30,64,175,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:radial-gradient(1100px 560px at 50% -8%, #e9f0ff 0%, rgba(233,240,255,0) 58%), var(--bg);
+  background-attachment:fixed;
+  color:var(--ink); font-size:15px; line-height:1.5;
+  letter-spacing:-.006em; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+::selection{background:#dbe8f7;color:var(--navy)}
+.hidden{display:none!important}
+
+/* ── Pantallas ───────────────────────────────────────────────────────────── */
+.screen{display:none;min-height:100dvh}
+.screen.active{display:block}
+#welcome.active{display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:24px}
+
+/* ── Marca / logo ────────────────────────────────────────────────────────── */
+.brand{display:flex;align-items:center;gap:7px}
+.logo{display:block;flex-shrink:0}
+.logo-sm{width:34px;height:34px;filter:drop-shadow(0 3px 8px rgba(79,110,247,.30))}
+.logo-lg{width:60px;height:60px;filter:drop-shadow(0 10px 22px rgba(79,110,247,.32))}
+.wordmark{font-size:17px;font-weight:650;letter-spacing:-.035em}
+.wm-sin{color:var(--navy)}.wm-mail{color:var(--ink);font-weight:450}
+
+/* ── Bienvenida ──────────────────────────────────────────────────────────── */
+.wc{width:100%;max-width:470px;display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:48px;background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  box-shadow:0 30px 70px rgba(79,110,247,.16), 0 2px 10px rgba(30,64,175,.05)}
+.wc-kicker{margin-bottom:22px;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--blue)}
+.wc .logo-lg{margin-bottom:24px}
+.wc-wm{font-size:30px;font-weight:650;letter-spacing:-.045em;line-height:1}
+.wc-tagline{margin-top:28px;font-size:30px;line-height:1.12;font-weight:600;letter-spacing:-.045em;color:var(--ink)}
+.wc-sub{margin-top:12px;font-size:14px;line-height:1.55;color:var(--muted)}
+.auth-stack{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:34px}
+.btn-native,.btn-google{min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;
+  border-radius:10px;font-size:14px;font-weight:600;transition:background .16s var(--ease),border-color .16s var(--ease)}
+.btn-native{background:var(--brand-grad);color:#fff;border:1px solid transparent;box-shadow:0 8px 20px rgba(79,110,247,.28)}
+.btn-native:hover{filter:brightness(1.05);box-shadow:0 10px 26px rgba(79,110,247,.34)}
+.btn-google{background:#fff;color:var(--ink);border:1px solid var(--line-strong)}
+.btn-google:hover{background:var(--surface-2);border-color:#b8c0cc}
+.wc-note{margin-top:16px;font-size:11.5px;color:var(--subtle);line-height:1.55}
+
+/* ── Barra superior ──────────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);
+  backdrop-filter:saturate(140%) blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+  gap:8px;padding:10px 20px;min-height:64px}
+.topbar-title{font-size:15px;font-weight:600;color:var(--ink);flex:1;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+  color:var(--muted);border:1px solid transparent;border-radius:9px;
+  transition:background .14s var(--ease),color .14s var(--ease),border-color .14s var(--ease)}
+.icon-btn:hover{background:var(--surface-2);color:var(--navy);border-color:var(--line)}
+.icon-btn.active{background:var(--blue-soft);color:var(--blue);border-color:#d9e5f3}
+.text-btn{padding:7px 9px;font-size:13px;font-weight:550;color:var(--blue);border-radius:8px}
+.text-btn:hover{background:var(--blue-soft)}
+.text-btn.muted{color:var(--muted)}
+.text-btn.muted:hover{background:var(--surface-2);color:var(--ink)}
+.text-btn.danger{color:var(--danger)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 10px 7px 4px;font-size:13px;
+  font-weight:550;color:var(--blue);border-radius:8px;flex-shrink:0}
+.back-btn:hover{background:var(--blue-soft)}
+.account-button{display:flex;align-items:center;gap:8px;max-width:210px;padding:5px 8px 5px 5px;
+  border:1px solid var(--line);border-radius:10px;background:#fff;
+  transition:background .14s var(--ease),border-color .14s var(--ease)}
+.account-button:hover{background:var(--surface-2);border-color:var(--line-strong)}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--brand-grad);color:#fff;font-size:10px;font-weight:650;flex:0 0 auto}
+.account-copy{display:flex;flex-direction:column;min-width:0;text-align:left}
+.account-name{display:block;font-size:11.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.account-mail{display:block;font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync-btn.syncing svg{animation:spin .8s linear infinite}
+.sync-btn:disabled{opacity:.5;cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Búsqueda e intención ────────────────────────────────────────────────── */
+.search-bar{max-width:760px;margin:14px auto 0;padding:8px 10px;display:flex;align-items:center;gap:10px;
+  background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-sm)}
+.search-bar.hidden{display:none}
+.search-scope{background:var(--surface-2);color:var(--muted);border:1px solid var(--line);
+  border-radius:7px;padding:6px 8px;font-size:11.5px}
+.search-input{flex:1;border:none;background:transparent;font-size:13.5px;color:var(--ink);outline:none}
+.search-input::placeholder,.intent-input::placeholder{color:var(--subtle)}
+.intent-shell{max-width:760px;margin:18px auto 0;padding:0 20px}
+.intent-box{display:flex;align-items:center;gap:10px;min-height:52px;padding:10px 12px;
+  background:#fff;border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow-sm)}
+.intent-box:focus-within{border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87,166,.08)}
+.intent-mark{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.intent-input{flex:1;border:none;background:transparent;font-size:14px;color:var(--ink);outline:none}
+.intent-go{padding:5px 9px;font-size:12.5px;font-weight:650;color:var(--blue);border:1px solid transparent;border-radius:8px}
+.intent-go:hover{background:var(--blue-soft);border-color:#dce8f5}
+
+/* ── Contenido y jerarquía ───────────────────────────────────────────────── */
+.content{max-width:760px;margin:0 auto;padding-bottom:110px}
+.big-title{padding:26px 20px 8px;font-size:24px;font-weight:650;letter-spacing:-.035em;color:var(--ink)}
+.presence-line{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 20px 12px;color:var(--muted);font-size:11.5px}
+.presence-line strong{color:var(--subtle);font-weight:500}
+
+/* ── Lista de correo ─────────────────────────────────────────────────────── */
+.email-list{list-style:none;margin:0 12px;background:#fff;border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.email-row{display:flex;align-items:flex-start;gap:12px;min-height:82px;padding:16px 18px;
+  border-bottom:1px solid var(--line);cursor:pointer;background:#fff;
+  transition:background .14s var(--ease),opacity .18s var(--ease),transform .18s var(--ease);
+  animation:rowIn .18s var(--ease) both}
+.email-row:last-child{border-bottom:0}
+.email-row:hover{background:#f9fafb}
+@keyframes rowIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.otros-row{animation:rowIn .18s var(--ease) both,otrosDrift 10s ease-in-out 1s infinite}
+@keyframes otrosDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.otros-row:hover,.otros-row:focus-within{animation:rowIn .18s var(--ease) both}
+.email-row[data-swipe=left]{background:var(--danger-soft)}
+.email-row[data-swipe=right]{background:#fff8eb}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.dot.read{opacity:0}
+.dot.urgente{background:var(--c-urgente)}.dot.por_responder{background:var(--c-por_responder)}
+.dot.para_leer{background:var(--c-para_leer)}.dot.boletines{background:var(--c-boletines)}
+.dot.archivo{background:var(--c-archivo)}.dot.otros{background:var(--c-otros)}.dot.papelera{background:var(--c-papelera)}
+.email-main{flex:1;min-width:0}
+.email-top{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
+.email-from{font-size:13.5px;font-weight:650;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-date{font-size:11px;color:var(--subtle);flex-shrink:0}
+.email-subject{font-size:13px;font-weight:550;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-subject.read{font-weight:450;color:var(--muted)}
+.email-preview{margin-top:3px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thread-badge{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;min-width:18px;height:18px;
+  padding:0 5px;background:var(--blue-soft);color:var(--blue);border-radius:5px;font-size:9px;font-weight:600;vertical-align:middle}
+.row-star{font-size:11px;color:var(--warning);flex-shrink:0;margin-top:5px}
+.row-restore-btn{color:var(--muted);padding:4px;border-radius:7px;flex-shrink:0;font-size:18px;line-height:1}
+.row-restore-btn:hover{background:var(--blue-soft);color:var(--blue)}
+
+/* ── Estados vacíos ──────────────────────────────────────────────────────── */
+.empty{padding:84px 24px 48px;text-align:center}
+.empty-orb{width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--line);margin:0 auto 20px}
+.empty-title{font-size:15px;font-weight:600;color:var(--ink-2);margin-bottom:8px}
+.empty-sub{font-size:13px;color:var(--subtle);max-width:240px;margin:0 auto}
+
+/* ── Cargar más ──────────────────────────────────────────────────────────── */
+.btn-load-more{display:block;width:calc(100% - 24px);margin:14px 12px 0;padding:12px;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  font-size:12.5px;font-weight:600;color:var(--muted);transition:all .18s var(--ease)}
+.btn-load-more:hover{background:var(--surface-2);border-color:var(--line-strong);color:var(--ink)}
+.btn-load-more.loading{pointer-events:none;opacity:.65}
+.btn-load-more.hidden{display:none}
+
+/* ── Navegación de intenciones (pill móvil / rail escritorio) ────────────── */
+.pill{position:fixed;left:0;right:0;bottom:0;z-index:200;display:flex;align-items:center;gap:4px;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none;
+  background:rgba(255,255,255,.98);border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(16,24,40,.05)}
+.pill::-webkit-scrollbar{display:none}
+.pill-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:1 1 0;
+  min-height:40px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:550;
+  color:var(--muted);white-space:nowrap}
+.pill-btn:hover{background:var(--surface-2);color:var(--ink)}
+.pill-btn.active{background:var(--ic-soft,#eaf1ff);color:var(--ink);font-weight:650;box-shadow:inset 0 0 0 1px var(--ic,#8db4f5)}
+.badge{position:absolute;top:3px;right:3px;min-width:13px;height:13px;padding:0 3px;
+  background:#e9eef5;color:var(--ink-2);border:1px solid #fff;border-radius:99px;
+  font-size:8px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.pill-btn.active .badge{background:#fff;color:var(--ic,var(--blue))}
+.badge.hidden{display:none}
+/* Riel de intenciones: elementos visibles solo en la barra lateral de escritorio */
+.rail-top,.rail-section{display:none}
+.pill .i-bar{display:none}
+.pill .full{display:none}.pill .short{display:inline}
+.rail-intentions{display:contents}
+/* Codificación de color por intención (la usa la barra lateral) */
+.pill-btn[data-cat=urgente]{--ic:#e07b71;--ic-soft:#fcefed}
+.pill-btn[data-cat=por_responder]{--ic:#6f9ae8;--ic-soft:#eef4fd}
+.pill-btn[data-cat=para_leer]{--ic:#5fb389;--ic-soft:#edf8f2}
+.pill-btn[data-cat=boletines]{--ic:#d9a456;--ic-soft:#fdf6ec}
+.pill-btn[data-cat=archivo]{--ic:#9fabc0;--ic-soft:#f0f3f8}
+.pill-btn[data-cat=otros]{--ic:#a18ade;--ic-soft:#f4f0fd}
+.pill-btn[data-cat=papelera]{--ic:#9fabc0;--ic-soft:#f0f3f8}
+
+/* ── Lector ──────────────────────────────────────────────────────────────── */
+.reader-content{max-width:760px;margin:0 auto;padding:28px 24px 120px}
+.ai-card{padding:14px 16px;margin-bottom:24px;background:#fff;border:1px solid var(--line);
+  border-left:3px solid var(--blue);border-radius:10px}
+.ai-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ai-badge{font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--blue-soft);color:var(--blue);border-radius:4px;padding:2px 6px}
+.cat-chip{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:2px 6px}
+.chip-urgente{background:var(--danger-soft);color:var(--danger)}
+.chip-por_responder{background:var(--blue-soft);color:var(--blue)}
+.chip-para_leer{background:var(--success-soft);color:var(--success)}
+.chip-boletines{background:var(--warning-soft);color:var(--warning)}
+.chip-otros{background:var(--violet-soft);color:var(--violet)}
+.chip-archivo,.chip-papelera{background:#eef1f7;color:var(--muted)}
+.ai-resumen{font-size:13px;line-height:1.55;color:var(--ink-2)}
+.otros-hint{font-size:12px;color:var(--subtle);margin-top:6px}
+.reader-subject{font-size:25px;font-weight:650;letter-spacing:-.04em;line-height:1.2;color:var(--ink)}
+.reader-meta{display:flex;justify-content:space-between;gap:12px;margin:10px 0 14px}
+.meta-from{font-size:13px;color:var(--muted)}
+.meta-date{font-size:12px;color:var(--subtle);flex-shrink:0}
+.divider{height:1px;background:var(--line);margin-bottom:20px}
+.reader-body{font-size:15px;line-height:1.75;color:var(--ink-2);white-space:pre-wrap;word-break:break-word;padding-bottom:32px}
+.section-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle);margin-bottom:10px}
+.recat-section{padding-top:20px;border-top:1px solid var(--line);margin-bottom:24px}
+.recat-grid{display:flex;flex-wrap:wrap;gap:6px}
+.recat-btn{font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+  background:#fff;color:var(--muted)}
+.recat-btn:hover{border-color:var(--line-strong);background:var(--surface-2);color:var(--ink)}
+.recat-btn.current{background:var(--navy);border-color:var(--navy);color:#fff}
+.reply-section{padding-top:20px;border-top:1px solid var(--line)}
+textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;
+  font-size:14.5px;color:var(--ink);resize:vertical;margin-bottom:10px;line-height:1.55}
+textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87,166,.08)}
+.btn-primary{width:100%;background:var(--brand-grad);color:#fff;border-radius:10px;padding:13px 20px;
+  font-size:14.5px;font-weight:600;margin-bottom:10px;box-shadow:0 8px 20px rgba(79,110,247,.26)}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-send{background:var(--success);box-shadow:0 8px 20px rgba(21,163,74,.24)}.btn-send:hover{filter:brightness(1.05)}
+.focus-bar{display:none;align-items:center;justify-content:space-between;gap:12px;
+  padding-top:20px;margin-top:4px;border-top:1px solid var(--line)}
+.reader-main.focus-mode .ai-card,.reader-main.focus-mode .recat-section,.reader-main.focus-mode .reply-section{display:none}
+.reader-main.focus-mode .focus-bar{display:flex}
+.reader-main.focus-mode .reader-body{font-size:16.5px;padding-bottom:8px}
+.focus-hint{font-size:12px;color:var(--subtle)}
+
+/* ── Hilo ────────────────────────────────────────────────────────────────── */
+.thread-title-hdr{max-width:760px;margin:0 auto;padding:24px 20px 10px}
+.thread-title-hdr h2{font-size:20px;font-weight:650;letter-spacing:-.03em;color:var(--ink)}
+.thread-msg{padding:20px;border-bottom:1px solid var(--line);background:#fff}
+.thread-msg:last-child{border-bottom:none}
+.thread-msg-hdr{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
+.thread-msg-from{font-size:13.5px;font-weight:600;color:var(--ink)}
+.thread-msg-date{font-size:11.5px;color:var(--subtle)}
+.thread-msg-body{font-size:14px;line-height:1.65;color:var(--ink-2);white-space:pre-wrap;max-height:220px;overflow:hidden}
+.thread-msg-actions{display:flex;gap:8px;margin-top:10px}
+
+/* ── Redactor ────────────────────────────────────────────────────────────── */
+.compose-content{max-width:760px;margin:0 auto;background:#fff;min-height:calc(100dvh - 64px);
+  border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.compose-row{display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 16px}
+.compose-label{font-size:12px;font-weight:600;color:var(--muted);min-width:52px;padding:14px 0;flex-shrink:0}
+.compose-input{flex:1;border:none;padding:14px 0;font-size:14.5px;background:transparent;color:var(--ink)}
+.compose-input:focus{outline:none}
+.compose-ai-row{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.btn-ai{border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:500;
+  color:var(--blue);background:#fff;white-space:nowrap}
+.btn-ai:hover{background:var(--blue-soft);border-color:#dce8f5}
+.btn-send-inline{background:var(--brand-grad);border-radius:9px;padding:7px 16px;font-size:14px;font-weight:600;color:#fff;box-shadow:0 6px 16px rgba(79,110,247,.26)}
+.btn-send-inline:hover{filter:brightness(1.05)}
+.compose-body{width:100%;border:none;padding:20px 16px;font-size:15px;color:var(--ink);resize:none;
+  min-height:280px;line-height:1.7;background:transparent;border-radius:0;margin:0}
+.compose-body:focus{outline:none;box-shadow:none}
+
+/* ── Reglas ──────────────────────────────────────────────────────────────── */
+.rules-wrap{max-width:760px;margin:0 auto;padding:30px 20px 90px}
+.rules-intro{font-size:13px;color:var(--muted);line-height:1.6;max-width:620px;margin-bottom:18px}
+.rule-card{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;
+  padding:14px;margin-bottom:10px;background:#fff}
+.rule-icon{width:30px;height:30px;border-radius:8px;background:var(--blue-soft);display:grid;place-items:center;
+  color:var(--blue);font-size:12px;font-weight:700;flex-shrink:0}
+.rule-main{flex:1;min-width:0}
+.rule-title{font-size:13.5px;font-weight:600;line-height:1.35;color:var(--ink)}
+.rule-meta{font-size:11.5px;color:var(--subtle);margin-top:4px}
+.rule-actions{display:flex;gap:4px}
+.rule-actions button{color:var(--muted);padding:5px;border-radius:8px;min-width:28px}
+.rule-actions button:hover{background:var(--surface-2);color:var(--ink)}
+
+/* ── Modales y hojas ─────────────────────────────────────────────────────── */
+.modal-overlay,.sheet-menu{position:fixed;inset:0;z-index:400;display:flex;justify-content:center;
+  background:rgba(16,24,40,.35);backdrop-filter:blur(3px)}
+.modal-overlay{align-items:flex-end}.sheet-menu{align-items:flex-end;z-index:450}
+.modal-overlay.hidden,.sheet-menu.hidden{display:none}
+.modal-card{width:100%;max-width:500px;background:#fff;border:1px solid var(--line);
+  border-radius:16px 16px 0 0;padding:20px 0 32px;box-shadow:0 -4px 40px rgba(16,24,40,.16)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 16px 16px;border-bottom:1px solid var(--line)}
+.modal-title{font-size:15px;font-weight:600;color:var(--ink)}
+.snooze-btn{width:100%;display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:14.5px;color:var(--ink-2);text-align:left}
+.snooze-btn:hover{background:var(--surface-2)}
+.snooze-ico{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);
+  border-radius:8px;background:var(--surface-2);color:var(--navy);font-size:10px;font-weight:700}
+.snooze-time{margin-left:auto;font-size:12.5px;color:var(--subtle)}
+.sheet-panel{width:100%;max-width:460px;background:#fff;border:1px solid var(--line);
+  border-radius:24px 24px 0 0;padding:12px 12px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -20px 80px rgba(15,23,42,.16)}
+.profile-head{display:flex;align-items:center;gap:12px;padding:12px}
+.profile-head .avatar{width:42px;height:42px}
+.profile-title{font-size:15px;font-weight:600;color:var(--ink)}
+.profile-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.menu-sep{height:1px;background:var(--line);margin:6px 4px}
+.menu-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px;border-radius:8px;text-align:left;font-size:14px;color:var(--ink-2)}
+.menu-item:hover{background:var(--surface-2)}
+.menu-item small{color:var(--subtle)}
+.menu-item.danger{color:var(--danger)}
+
+/* ── Conexiones (Google + IA) ────────────────────────────────────────────── */
+.conn-body{padding:2px 12px 10px}
+.conn-label{display:block;margin:12px 2px 6px;font-size:10.5px;font-weight:650;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--subtle)}
+.conn-input,.conn-select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:14px;background:#fff;color:var(--ink);outline:none}
+.conn-input:focus,.conn-select:focus{border-color:#9db4e8;box-shadow:0 0 0 3px rgba(111,131,240,.10)}
+.conn-note{margin:12px 2px 4px;font-size:11px;line-height:1.5;color:var(--subtle)}
+.conn-actions{display:flex;gap:8px;margin-top:14px}
+.conn-actions .btn-primary{margin-bottom:0;flex:1}
+.conn-actions .text-btn{flex:0 0 auto;align-self:center}
+
+/* Móvil/tablet: solo 5 intenciones en la barra; Archivo y Papelera van al menú */
+@media(max-width:1079px){
+  .pill-btn[data-cat=archivo],.pill-btn[data-cat=papelera]{display:none}
+}
+@media(min-width:1080px){
+  .menu-mobile-only{display:none}
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:500;display:none;
+  align-items:center;gap:10px;max-width:calc(100vw - 40px);padding:10px 14px;border-radius:10px;
+  background:#2e3b55;color:#fff;font-size:12.5px;text-align:center;box-shadow:0 12px 30px rgba(46,59,85,.22)}
+.toast.show{display:flex}
+.toast-undo{flex-shrink:0;background:rgba(255,255,255,.18);border-radius:6px;padding:4px 10px;
+  color:#fff;font-size:12px;font-weight:600}
+.toast-undo:hover{background:rgba(255,255,255,.28)}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media(max-width:560px){
+  #welcome.active{padding:0}
+  .wc{min-height:100dvh;max-width:none;border:0;border-radius:0;box-shadow:none;padding:42px 24px 34px;justify-content:center}
+  .topbar-inner{padding:9px 12px;min-height:56px}
+  .account-copy{display:none}
+  .account-button{padding:4px;border:0;background:transparent}
+  .intent-shell{padding:0 12px;margin-top:12px}
+  .search-bar{margin:10px 12px 0}
+  .big-title{font-size:22px}
+  .wc-tagline{font-size:28px}
+  .reader-content{padding:22px 16px 105px}
+  .reader-subject{font-size:22px}
+  .compose-content{border:0}
+}
+@media(min-width:700px){
+  .email-list{margin:0}
+  .btn-load-more{width:100%;margin-left:0;margin-right:0}
+  .modal-overlay,.sheet-menu{align-items:center}
+  .modal-card{border-radius:16px;max-width:420px}
+  .sheet-panel{border-radius:16px;max-width:390px}
+  .toast{bottom:30px}
+}
+/* Escritorio: barra lateral de intenciones (app shell propio, no estilo Gmail) */
+@media(min-width:1080px){
+  #inbox{padding-left:268px}
+  #inbox .topbar-inner{justify-content:flex-end}
+  #inbox .topbar .brand{display:none}
+  #btn-compose-top{display:none}
+  .pill{top:0;left:0;right:auto;bottom:0;width:268px;max-width:none;
+    flex-direction:column;align-items:stretch;gap:0;overflow-x:hidden;overflow-y:auto;
+    padding:18px 16px 16px;border:0;border-right:1px solid var(--line);border-radius:0;
+    background:#fff;box-shadow:none}
+  .rail-top{display:block}
+  .rail-brand{display:flex;align-items:center;gap:7px;padding:4px 6px 14px}
+  .rail-compose{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;
+    border-radius:12px;background:var(--brand-grad);color:#fff;font-size:14px;font-weight:600;
+    box-shadow:0 8px 20px rgba(79,110,247,.26)}
+  .rail-compose:hover{filter:brightness(1.05)}
+  .rail-intentions{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+  .rail-section{display:block;padding:16px 10px 6px;font-size:10px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--subtle)}
+  .pill-btn{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:11px;flex:none;
+    width:100%;min-height:42px;padding:9px 12px 9px 9px;border-radius:10px;text-align:left;
+    font-size:13.5px;font-weight:550;color:var(--ink-2);white-space:normal;box-shadow:none}
+  .pill .i-bar{display:block;width:4px;height:17px;border-radius:99px;background:var(--ic);opacity:.5;flex-shrink:0;transition:opacity .15s}
+  .pill .i-name{flex:1;min-width:0}
+  .pill .full{display:inline}.pill .short{display:none}
+  .pill-btn:hover{background:var(--surface-2);color:var(--ink)}
+  .pill-btn:hover .i-bar{opacity:.8}
+  .pill-btn.active{background:var(--ic-soft);color:var(--ink);font-weight:650;box-shadow:none}
+  .pill-btn.active .i-bar{opacity:1}
+  .badge{position:static;top:auto;right:auto;transform:none;margin-left:auto;
+    min-width:19px;height:18px;padding:0 5px;background:var(--ic-soft);color:var(--ic);
+    border:0;border-radius:6px;font-size:10px}
+  .pill-btn.active .badge{background:#fff;color:var(--ic)}
+  .content,.intent-shell,.search-bar{max-width:820px}
+  .content{padding-bottom:48px}
+  .toast{bottom:30px;left:calc(50% + 134px)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<noscript>
+  <div style="position:fixed;left:12px;right:12px;top:12px;z-index:9999;background:#1e40af;color:#fff;font:13px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:12px 16px;border-radius:12px;text-align:center;box-shadow:0 8px 24px rgba(30,64,175,.3)">
+    Este prototipo necesita JavaScript. Si lo estás viendo en una vista previa (chat o visor de archivos),
+    descárgalo y ábrelo con <b>Chrome, Safari o Edge</b>.
+  </div>
+</noscript>
+
+<!-- Definiciones SVG compartidas (degradado de marca) -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+  <linearGradient id="sinmail-grad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8abdff"/>
+    <stop offset="1" stop-color="#6f83f0"/>
+  </linearGradient>
+</defs></svg>
+
+<!-- ═══ BIENVENIDA ═══ -->
+<div id="welcome" class="screen active">
+  <div class="wc">
+    <p class="wc-kicker">CORREO POR INTENCIÓN</p>
+    <svg class="logo logo-lg" viewBox="0 0 32 32" role="img" aria-label="SinMail">
+      <circle cx="16" cy="16" r="14" fill="url(#sinmail-grad)"/>
+      <path d="M9.5 19 16 13 22.5 19" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="wc-wm"><span class="wm-sin">sin</span><span class="wm-mail">mail</span></div>
+    <p class="wc-tagline">Un mail, sin el caos.</p>
+    <p class="wc-sub">Menos ruido. Más presencia.</p>
+    <div class="auth-stack">
+      <button class="btn-native" onclick="entrarDemo('sinmail')">Crear correo @sinmail.app</button>
+      <button class="btn-google" onclick="entrarDemo('google')">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+    <p class="wc-note">Prototipo interactivo. Tus cambios se guardan solo en este navegador.</p>
+  </div>
+</div>
+
+<!-- ═══ BANDEJA ═══ -->
+<div id="inbox" class="screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="SinMail">
+        <svg class="logo logo-sm" viewBox="0 0 32 32" role="img" aria-label="SinMail">
+          <circle cx="16" cy="16" r="14" fill="url(#sinmail-grad)"/>
+          <path d="M9.5 19 16 13 22.5 19" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="wordmark"><span class="wm-sin">Sin</span><span class="wm-mail">Mail</span></span>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btn-search-toggle" onclick="toggleSearch()" title="Buscar" aria-label="Buscar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-compose-top" onclick="ir('composer')" title="Redactar" aria-label="Redactar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="icon-btn sync-btn" id="sync-btn" onclick="sincronizar()" title="Sincronizar" aria-label="Sincronizar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 6v5h-5"/><path d="M4 18v-5h5"/><path d="M18.5 9A7 7 0 0 0 6 6.5L4 11"/><path d="M5.5 15A7 7 0 0 0 18 17.5L20 13"/></svg>
+        </button>
+        <button class="account-button" onclick="toggleAccountMenu()" aria-label="Abrir cuenta">
+          <span class="avatar" id="avatar-ini">RR</span>
+          <span class="account-copy"><span class="account-name" id="account-name">Rodolfo</span><span class="account-mail" id="active-account">rodolfo@sinmail.app</span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="search-bar" class="search-bar hidden">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#98a2b3" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <select id="search-scope" class="search-scope" onchange="filtrarBusqueda(document.getElementById('search-input').value)" aria-label="Ámbito de búsqueda">
+      <option value="all">Todo</option><option value="sender">Remitente</option><option value="subject">Asunto</option>
+    </select>
+    <input id="search-input" class="search-input" type="search" placeholder="Buscar en todos los correos…" oninput="filtrarBusqueda(this.value)" autocomplete="off">
+  </div>
+
+  <div class="intent-shell">
+    <div class="intent-box">
+      <span class="intent-mark"></span>
+      <input id="intent-input" class="intent-input" placeholder="¿Qué necesitas atender?" onkeydown="if(event.key==='Enter')aplicarIntencion()" aria-label="Barra de intención">
+      <button class="intent-go" onclick="aplicarIntencion()">Ordenar</button>
+    </div>
+  </div>
+
+  <main class="content">
+    <h2 id="cat-title" class="big-title">Urgente</h2>
+    <div class="presence-line"><span id="presence-copy">Veamos lo esencial.</span><strong id="sync-status">Actualizado ahora</strong></div>
+    <ul id="email-list" class="email-list" aria-live="polite"></ul>
+    <button id="load-more" class="btn-load-more hidden" onclick="cargarMas()">Cargar mensajes anteriores</button>
+    <div id="empty-state" class="empty" style="display:none">
+      <div class="empty-orb"></div>
+      <p id="empty-title" class="empty-title"></p>
+      <p id="empty-sub" class="empty-sub"></p>
+    </div>
+  </main>
+
+  <nav class="pill" aria-label="Intenciones">
+    <div class="rail-top">
+      <div class="brand rail-brand" aria-hidden="true">
+        <svg class="logo logo-sm" viewBox="0 0 32 32" role="img" aria-label="SinMail">
+          <circle cx="16" cy="16" r="14" fill="url(#sinmail-grad)"/>
+          <path d="M9.5 19 16 13 22.5 19" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="wordmark"><span class="wm-sin">Sin</span><span class="wm-mail">Mail</span></span>
+      </div>
+      <button class="rail-compose" onclick="ir('composer')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Redactar
+      </button>
+    </div>
+    <div class="rail-intentions">
+      <span class="rail-section">Ahora</span>
+      <button class="pill-btn active" data-cat="urgente" onclick="cambiarCat('urgente',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Urgente</span><span class="short">Urgente</span></span><span class="badge hidden"></span></button>
+      <button class="pill-btn" data-cat="por_responder" onclick="cambiarCat('por_responder',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Por responder</span><span class="short">Responder</span></span><span class="badge hidden"></span></button>
+      <span class="rail-section">Para después</span>
+      <button class="pill-btn" data-cat="para_leer" onclick="cambiarCat('para_leer',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Para leer</span><span class="short">Leer</span></span><span class="badge hidden"></span></button>
+      <button class="pill-btn" data-cat="boletines" onclick="cambiarCat('boletines',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Boletines</span><span class="short">Boletines</span></span><span class="badge hidden"></span></button>
+      <span class="rail-section">En reposo</span>
+      <button class="pill-btn" data-cat="archivo" onclick="cambiarCat('archivo',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Archivo</span><span class="short">Archivo</span></span><span class="badge hidden"></span></button>
+      <button class="pill-btn" data-cat="otros" onclick="cambiarCat('otros',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Otros</span><span class="short">Otros</span></span><span class="badge hidden"></span></button>
+      <button class="pill-btn" data-cat="papelera" onclick="cambiarCat('papelera',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Papelera</span><span class="short">Papelera</span></span><span class="badge hidden"></span></button>
+    </div>
+  </nav>
+</div>
+
+<!-- ═══ LECTOR ═══ -->
+<div id="reader" class="screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" onclick="volverBandeja()">
+        <svg width="8" height="13" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 1 1 7 7 13"/></svg>
+        Volver
+      </button>
+      <div class="topbar-actions">
+        <button class="text-btn muted" id="btn-focus-toggle" onclick="toggleFocus()" title="Modo foco">Enfocar</button>
+        <button class="icon-btn" onclick="mostrarSnooze()" title="Posponer" aria-label="Posponer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="text-btn muted" id="btn-leido" onclick="toggleLeido()">No leído</button>
+        <button class="text-btn" onclick="archivar()">Archivar</button>
+        <button class="text-btn muted" id="btn-delete" onclick="eliminar()">Eliminar</button>
+      </div>
+    </div>
+  </header>
+  <main class="reader-content reader-main" id="reader-main">
+    <div class="ai-card">
+      <div class="ai-card-hdr"><span class="ai-badge">IA</span><span id="r-chip" class="cat-chip"></span><button id="btn-resumir" class="text-btn hidden" style="margin-left:auto;padding:3px 8px;font-size:12px" onclick="resumirConIA()">Resumir</button></div>
+      <p id="r-resumen" class="ai-resumen"></p>
+      <p id="r-otros-hint" class="otros-hint hidden">Sin lugar claro. Muévelo y SinMail aprenderá.</p>
+    </div>
+    <h2 id="r-asunto" class="reader-subject"></h2>
+    <div class="reader-meta"><span id="r-from" class="meta-from"></span><span id="r-fecha" class="meta-date"></span></div>
+    <div class="divider"></div>
+    <div id="r-body" class="reader-body"></div>
+    <div class="recat-section">
+      <p class="section-label">Mover a</p>
+      <div class="recat-grid" id="recat-grid"></div>
+    </div>
+    <div class="reply-section">
+      <p class="section-label">Responder con IA</p>
+      <textarea id="reply-instr" rows="2" placeholder="Ej: acepto la reunión del jueves y pido el orden del día"></textarea>
+      <button class="btn-primary" id="btn-draft" onclick="generarBorrador()">Generar borrador</button>
+      <div id="draft-area" style="display:none">
+        <textarea id="draft-body" rows="6"></textarea>
+        <button class="btn-primary btn-send" onclick="enviarRespuesta()">Enviar respuesta</button>
+      </div>
+    </div>
+    <div class="focus-bar">
+      <span class="focus-hint">Lectura sin distracciones.</span>
+      <button class="text-btn" onclick="siguienteEnFoco()">Siguiente →</button>
+    </div>
+  </main>
+</div>
+
+<!-- ═══ HILO ═══ -->
+<div id="thread" class="screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" onclick="ir('inbox')">
+        <svg width="8" height="13" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 1 1 7 7 13"/></svg>
+        Volver
+      </button>
+      <span id="thread-title" class="topbar-title"></span>
+      <div style="width:56px"></div>
+    </div>
+  </header>
+  <main class="content" style="padding-bottom:40px">
+    <div class="thread-title-hdr"><h2 id="thread-subject"></h2></div>
+    <div id="thread-list"></div>
+  </main>
+</div>
+
+<!-- ═══ REGLAS ═══ -->
+<div id="rules" class="screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" onclick="ir('inbox')">
+        <svg width="8" height="13" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 1 1 7 7 13"/></svg>
+        Volver
+      </button>
+      <span class="topbar-title">Reglas de clasificación</span>
+      <div style="width:56px"></div>
+    </div>
+  </header>
+  <main class="rules-wrap">
+    <p class="rules-intro">Revisa, pausa o borra lo que SinMail ha aprendido de tus correcciones.</p>
+    <div id="rules-list"></div>
+  </main>
+</div>
+
+<!-- ═══ REDACTOR ═══ -->
+<div id="composer" class="screen">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-btn" onclick="ir('inbox')">
+        <svg width="8" height="13" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 1 1 7 7 13"/></svg>
+        Cancelar
+      </button>
+      <span class="topbar-title">Nuevo correo</span>
+      <button class="btn-send-inline" onclick="enviarCorreo()">Enviar</button>
+    </div>
+  </header>
+  <main class="compose-content">
+    <div class="compose-row"><label class="compose-label" for="c-to">Para</label><input id="c-to" class="compose-input" type="email" placeholder="destinatario@email.com"></div>
+    <div class="compose-row"><label class="compose-label" for="c-subject">Asunto</label><input id="c-subject" class="compose-input" type="text"></div>
+    <div class="compose-ai-row">
+      <input id="c-instr" class="compose-input" type="text" placeholder="Instrucción para la IA (opcional)" style="padding:4px 0;margin:0">
+      <button class="btn-ai" onclick="redactarConIA()">Redactar con IA</button>
+    </div>
+    <textarea id="c-body" class="compose-body" placeholder="Escribe tu correo…"></textarea>
+  </main>
+</div>
+
+<!-- ═══ MODAL POSPONER ═══ -->
+<div id="snooze-modal" class="modal-overlay hidden" onclick="if(event.target===this)cerrarSnooze()">
+  <div class="modal-card">
+    <div class="modal-hdr">
+      <span class="modal-title">Recordar después</span>
+      <button class="icon-btn" onclick="cerrarSnooze()" aria-label="Cerrar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <button class="snooze-btn" onclick="aplicarSnooze('tarde')"><span class="snooze-ico">17</span><span>Esta tarde</span><span class="snooze-time">Hoy 17:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('manana')"><span class="snooze-ico">09</span><span>Mañana por la mañana</span><span class="snooze-time">Mañana 09:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('semana')"><span class="snooze-ico">L</span><span>La próxima semana</span><span class="snooze-time">Lun 09:00</span></button>
+    <button class="snooze-btn" onclick="aplicarSnooze('demo')"><span class="snooze-ico">1'</span><span>En un minuto</span><span class="snooze-time">Demo</span></button>
+  </div>
+</div>
+
+<!-- ═══ MENÚ DE CUENTA ═══ -->
+<div id="account-menu" class="sheet-menu hidden" onclick="if(event.target===this)toggleAccountMenu()">
+  <div class="sheet-panel">
+    <div class="profile-head"><span class="avatar" id="profile-ini">RR</span><div><div class="profile-title" id="profile-name">Rodolfo Ramírez</div><div class="profile-sub" id="profile-account">rodolfo@sinmail.app</div></div></div>
+    <div class="menu-sep"></div>
+    <button class="menu-item" onclick="switchAccount()"><span>Cambiar cuenta</span><small id="switch-hint">SinMail · Google</small></button>
+    <button class="menu-item menu-mobile-only" onclick="irCategoria('archivo')"><span>Archivo</span><small>Sin urgencia</small></button>
+    <button class="menu-item menu-mobile-only" onclick="irCategoria('papelera')"><span>Papelera</span><small>30 días</small></button>
+    <button class="menu-item" onclick="abrirReglas()"><span>Reglas de clasificación</span><small id="rules-count">2</small></button>
+    <button class="menu-item" onclick="abrirConexiones()"><span>Conexiones</span><small>Google · Groq</small></button>
+    <div class="menu-sep"></div>
+    <button class="menu-item" onclick="reiniciarDemo()"><span>Reiniciar demo</span><small>Restaurar datos</small></button>
+    <button class="menu-item danger" onclick="cerrarSesion()"><span>Cerrar sesión</span></button>
+  </div>
+</div>
+
+<!-- ═══ CONEXIONES (Google + IA) ═══ -->
+<div id="conn-sheet" class="sheet-menu hidden" onclick="if(event.target===this)cerrarConexiones()">
+  <div class="sheet-panel">
+    <div class="profile-head">
+      <span class="avatar">⚙︎</span>
+      <div><div class="profile-title">Conexiones</div><div class="profile-sub">Se guardan solo en este dispositivo.</div></div>
+    </div>
+    <div class="menu-sep"></div>
+    <div class="conn-body">
+      <label class="conn-label" for="conn-nombre">Nombre</label>
+      <input id="conn-nombre" class="conn-input" type="text" autocomplete="name">
+      <label class="conn-label" for="conn-email">Cuenta de Google</label>
+      <input id="conn-email" class="conn-input" type="email" placeholder="tu@gmail.com" autocomplete="email">
+      <label class="conn-label" for="conn-key">Groq API key</label>
+      <input id="conn-key" class="conn-input" type="password" placeholder="gsk_…" autocomplete="off">
+      <label class="conn-label" for="conn-model">Modelo de IA</label>
+      <select id="conn-model" class="conn-select">
+        <option value="llama-3.3-70b-versatile">Llama 3.3 70B · mejor calidad</option>
+        <option value="llama-3.1-8b-instant">Llama 3.1 8B · más rápido</option>
+      </select>
+      <p class="conn-note">Con la clave de Groq, los borradores, la redacción y los resúmenes usan IA real. Sin ella, SinMail simula la IA. La identidad de Google personaliza tu cuenta (la sincronización real requiere OAuth).</p>
+      <div class="conn-actions">
+        <button class="text-btn" onclick="probarIA()">Probar IA</button>
+        <button class="btn-primary" onclick="guardarConexiones()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════════════
+   SINMAIL · LÓGICA
+   Vanilla JS, sin dependencias. Estado en memoria + persistencia en localStorage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const STORE_KEY = 'sinmail.state.v1';
+
+/* ── Datos semilla (fuente de contenido) ─────────────────────────────────── */
+function emailsSemilla(){ return [
+  {id:1, de:'Ana Martínez', email:'ana@startup.com', asunto:'Reunión de presupuesto — necesito confirmación hoy',
+   resumen:'Confirma la reunión de presupuesto Q4 antes de las 17h.',
+   preview:'¿Puedes confirmar antes de las 17h?',
+   cuerpo:'Hola,\n\nNecesitamos confirmar la reunión de presupuesto Q4 para hoy antes de las 17:00. El equipo de finanzas está esperando tu visto bueno.\n\nPor favor confirma asistencia.\n\nAna',
+   fecha:'10:32', cat:'urgente', leido:false, destacado:false, thread_id:'t1', thread_count:3},
+  {id:2, de:'Sergio Ruiz', email:'sergio@ops.io', asunto:'CRÍTICO: servidor de pagos caído desde las 14:00',
+   resumen:'Servidor de pagos inactivo; aprueba escalar al proveedor.',
+   preview:'El sistema lleva 2h sin responder…',
+   cuerpo:'El servidor de pagos lleva caído desde las 14:00.\nLos clientes no pueden completar compras y estamos perdiendo ingresos en tiempo real.\n\nNecesito tu aprobación para escalar al proveedor con prioridad máxima.\n\nSergio Ruiz\nOps Lead',
+   fecha:'09:14', cat:'urgente', leido:false, destacado:true, thread_id:'t2', thread_count:1},
+  {id:3, de:'Tú', email:'rodolfo@sinmail.app', asunto:'Re: Reunión de presupuesto',
+   resumen:'Pides mover la reunión a las 16h y confirmas asistencia.',
+   preview:'¿Podríamos a las 16h en la sala 3?',
+   cuerpo:'Hola Ana,\n\nConfirmo asistencia. ¿Podríamos moverla a las 16:00 en la sala 3? Así llego con el informe Q3 cerrado.\n\nUn saludo,\nRodolfo',
+   fecha:'11:05', cat:'urgente', leido:true, destacado:false, thread_id:'t1', thread_count:3},
+  {id:4, de:'Ana Martínez', email:'ana@startup.com', asunto:'Re: Reunión de presupuesto',
+   resumen:'Ana acepta las 16h en la sala 3 y pide el informe Q3.',
+   preview:'Perfecto, confirmo para las 16h…',
+   cuerpo:'Perfecto, confirmo para las 16:00 en la sala 3.\n\nTrae el informe Q3 si puedes. Gracias por la rapidez.\n\nAna',
+   fecha:'11:20', cat:'urgente', leido:false, destacado:false, thread_id:'t1', thread_count:3},
+  {id:5, de:'Carlos Gómez', email:'carlos@client.es', asunto:'Re: Propuesta — ¿hablamos esta tarde?',
+   resumen:'Cliente interesado; propone llamada entre 15 y 17h para cerrar.',
+   preview:'Podemos hablar entre las 15 y 17h…',
+   cuerpo:'Gracias por la propuesta, nos encaja muy bien.\n\n¿Podemos hablar esta tarde entre las 15:00 y las 17:00 para cerrar los detalles?\n\nQuedo disponible.\n\nCarlos',
+   fecha:'Ayer', cat:'por_responder', leido:false, destacado:false, thread_id:'t3', thread_count:1},
+  {id:6, de:'Elena Torres', email:'elena@rrhh.com', asunto:'Revisión de contrato — firma pendiente',
+   resumen:'RRHH pide firmar el contrato renovado antes de fin de mes.',
+   preview:'El contrato renovado está pendiente…',
+   cuerpo:'Hola,\n\nEl contrato renovado está listo para firma. Necesitamos que lo revises y firmes antes de fin de mes.\n\nPuedes firmarlo digitalmente en el enlace adjunto.\n\nElena Torres\nRRHH',
+   fecha:'Lun', cat:'por_responder', leido:true, destacado:false, thread_id:'t4', thread_count:1},
+  {id:7, de:'Marta Lao', email:'marta@proveedor.com', asunto:'Presupuesto revisado — ¿lo apruebas?',
+   resumen:'Adjunta presupuesto revisado; espera aprobación para emitir factura.',
+   preview:'Te adjunto la versión con el descuento…',
+   cuerpo:'Hola Rodolfo,\n\nTe adjunto el presupuesto revisado con el descuento acordado del 8%.\n\nSi lo apruebas, emito la factura esta misma semana.\n\nGracias,\nMarta',
+   fecha:'Lun', cat:'por_responder', leido:false, destacado:false, thread_id:'t5', thread_count:1},
+  {id:8, de:'Paul Graham', email:'pg@paulgraham.com', asunto:'Do Things that Don\'t Scale',
+   resumen:'Ensayo: hacer cosas no escalables al inicio de una startup.',
+   preview:'One of the most common mistakes founders make…',
+   cuerpo:'One of the most common mistakes founders make is trying to scale before they\'ve figured out what to scale.\n\nDo things that don\'t scale. Talk to users. Do things manually. Recruit users one by one.\n\nThe time to optimize is after you know what you\'re doing.',
+   fecha:'Lun', cat:'para_leer', leido:false, destacado:false, thread_id:'t6', thread_count:1},
+  {id:9, de:'María Sánchez', email:'maria@revista.com', asunto:'El minimalismo digital y la atención',
+   resumen:'Artículo largo sobre atención y diseño sereno. Sin acción requerida.',
+   preview:'Por qué el ruido constante nos cuesta más de lo que creemos…',
+   cuerpo:'El minimalismo digital no es estética: es una forma de proteger la atención.\n\nCada notificación es una pequeña deuda cognitiva. Reducir el ruido no es renunciar, es recuperar la capacidad de elegir a qué dedicamos nuestra presencia.\n\nUna lectura para el fin de semana.',
+   fecha:'Dom', cat:'para_leer', leido:false, destacado:false, thread_id:'t7', thread_count:1},
+  {id:10, de:'Dense Discovery', email:'hello@densediscovery.com', asunto:'Dense Discovery #241 — diseño y cultura',
+   resumen:'Selección semanal sobre diseño, tecnología y cultura digital.',
+   preview:'A weekly newsletter for curious minds…',
+   cuerpo:'Esta semana:\n\n— Por qué el minimalismo digital regresó\n— Herramientas que no necesitas pero igual quieres\n— El problema real con los sistemas de diseño\n— Lectura larga: “The Aesthetics of Silence”\n\nBuena semana,\nMikael',
+   fecha:'Dom', cat:'boletines', leido:false, destacado:false, thread_id:'t8', thread_count:1},
+  {id:11, de:'Pragmatic Engineer', email:'gergely@newsletter.com', asunto:'Engineering Levels Explained',
+   resumen:'Cómo funcionan los niveles de ingeniería y cómo avanzar.',
+   preview:'How do you know when you\'re ready for L5?',
+   cuerpo:'Los niveles de ingeniería son confusos. Así los entiendo:\n\nL3: Resuelves problemas que te dan.\nL4: Encuentras y resuelves problemas.\nL5: Defines qué problemas importan.\nL6+: Cambias cómo piensa la organización.\n\nEl salto L4 → L5 es el más difícil.',
+   fecha:'Sáb', cat:'boletines', leido:true, destacado:false, thread_id:'t9', thread_count:1},
+  {id:12, de:'Stripe', email:'news@stripe.com', asunto:'Novedades del producto · junio',
+   resumen:'Resumen de novedades de producto del mes.',
+   preview:'Nuevos métodos de pago y mejoras en facturación…',
+   cuerpo:'Este mes lanzamos:\n\n— Nuevos métodos de pago locales en 6 países.\n— Mejoras en la facturación recurrente.\n— Panel de disputas renovado.\n\nGracias por construir con nosotros.',
+   fecha:'Vie', cat:'boletines', leido:true, destacado:false, thread_id:'t10', thread_count:1},
+  {id:13, de:'Notion', email:'notify@notion.so', asunto:'Tu workspace está configurado',
+   resumen:'Notificación de bienvenida, no requiere acción.',
+   preview:'Empieza a organizar tu trabajo…',
+   cuerpo:'Tu workspace de Notion está listo.\n\nEmpieza con una plantilla o crea tu primera página.',
+   fecha:'22 may', cat:'archivo', leido:true, destacado:false, thread_id:'t11', thread_count:1},
+  {id:14, de:'Banco Atlas', email:'avisos@bancoatlas.com', asunto:'Factura de mayo disponible',
+   resumen:'Factura mensual emitida; sin acción inmediata.',
+   preview:'Tu factura de mayo ya está disponible…',
+   cuerpo:'Hola,\n\nTu factura correspondiente a mayo ya está disponible en tu área privada.\n\nImporte: 49,00 €. Cargo realizado el 28/05.\n\nGracias por tu confianza.',
+   fecha:'21 may', cat:'archivo', leido:true, destacado:false, thread_id:'t12', thread_count:1},
+  {id:15, de:'SurveyMonkey', email:'noreply@surveymonkey.com', asunto:'You\'ve been invited to a survey',
+   resumen:'Invitación a encuesta de 5 minutos. Clasificación incierta.',
+   preview:'Please complete this 5-minute survey…',
+   cuerpo:'You\'ve been invited to participate in a brief survey.\n\nEstimated time: 5 minutes.\n\nYour feedback helps us improve our service.',
+   fecha:'23 may', cat:'otros', leido:false, destacado:false, thread_id:'t13', thread_count:1},
+  {id:16, de:'Eventos Norte', email:'hola@eventosnorte.com', asunto:'¿Te interesa ponente para octubre?',
+   resumen:'Propuesta para participar como ponente. Decisión pendiente.',
+   preview:'Nos encantaría contar contigo…',
+   cuerpo:'Hola Rodolfo,\n\nOrganizamos una jornada sobre diseño y atención en octubre y nos encantaría contar contigo como ponente.\n\n¿Te interesaría? Sin compromiso por ahora.\n\nEquipo Eventos Norte',
+   fecha:'24 may', cat:'otros', leido:false, destacado:false, thread_id:'t14', thread_count:1},
+  {id:17, de:'LinkedIn', email:'messages@linkedin.com', asunto:'Tienes 3 notificaciones nuevas',
+   resumen:'Notificaciones de red social, bajo valor.',
+   preview:'Carlos Ruiz aceptó tu solicitud…',
+   cuerpo:'Carlos Ruiz aceptó tu solicitud de conexión.\nTienes 2 mensajes sin leer.\nTu perfil fue visto 12 veces esta semana.',
+   fecha:'Hace 2d', cat:'papelera', leido:true, destacado:false, thread_id:'t15', thread_count:1},
+  {id:18, de:'Ofertas Ya', email:'promo@ofertasya.com', asunto:'🔥 -70% solo hoy, no te lo pierdas',
+   resumen:'Correo promocional. Eliminado.',
+   preview:'Últimas horas para aprovechar…',
+   cuerpo:'¡Solo por hoy! Descuentos de hasta el 70% en toda la tienda.\n\nNo dejes pasar esta oportunidad única.',
+   fecha:'Hace 3d', cat:'papelera', leido:true, destacado:false, thread_id:'t16', thread_count:1},
+]; }
+
+function reglasSemilla(){ return [
+  {id:1, texto:'Los correos de startup.com se consideran importantes.', origen:'Aprendida tras 3 correcciones', activa:true},
+  {id:2, texto:'Los boletines y newsletters se envían a Boletines.', origen:'Creada por ti', activa:true},
+]; }
+
+/* ── Estado ──────────────────────────────────────────────────────────────── */
+let EMAILS = emailsSemilla();
+let RULES = reglasSemilla();
+let catActual = 'urgente';
+let emailActual = null;
+let deleteStep = 0;
+let focusMode = false;
+let searchMode = false;
+let pageSize = 6;
+let activeProvider = 'sinmail';
+let syncing = false;
+let toastTimer = null;
+let deleteTimer = null;
+
+const NOMBRES = {urgente:'Urgente', por_responder:'Por responder', para_leer:'Para leer',
+  boletines:'Boletines', archivo:'Archivo', otros:'Otros', papelera:'Papelera'};
+const ORDEN = ['urgente','por_responder','para_leer','boletines','archivo','otros','papelera'];
+const PRESENCIA = {
+  urgente:'Veamos lo esencial.', por_responder:'Conversaciones que te esperan.',
+  para_leer:'Cuando tengas calma.', boletines:'A tu ritmo.',
+  archivo:'En orden, sin urgencia.', otros:'Pendiente de tu decisión.', papelera:'Lo descartado.'};
+const EMPTY = {
+  urgente:['Todo en calma.','Nada requiere tu atención inmediata.'],
+  por_responder:['Nada pendiente.','No hay mensajes esperando respuesta.'],
+  para_leer:['La bandeja respira.','No hay nada nuevo para leer.'],
+  boletines:['Sin novedades.','Sin boletines por ahora.'],
+  archivo:['El archivo descansa.','El archivo está en orden.'],
+  otros:['Sin incertidumbre.','No hay nada esperando una categoría.'],
+  papelera:['La papelera está vacía.','Los correos eliminados aparecen aquí.'],
+};
+const FRASES = ['Cerrado.','Resuelto.','Guardado.','Ciclo completado.','Todo en su lugar.'];
+
+/* ── Persistencia ────────────────────────────────────────────────────────── */
+function guardar(){
+  try{
+    const overrides = {};
+    EMAILS.forEach(e => { overrides[e.id] = {cat:e.cat, leido:e.leido, destacado:e.destacado, snooze_until:e.snooze_until||null, snooze_cat:e.snooze_cat||null, resumen:e.resumen}; });
+    localStorage.setItem(STORE_KEY, JSON.stringify({overrides, rules:RULES, provider:activeProvider}));
+  }catch(_){ /* almacenamiento no disponible: el demo sigue en memoria */ }
+}
+function cargar(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(s.overrides) EMAILS.forEach(e => { const o = s.overrides[e.id]; if(o){ e.cat=o.cat; e.leido=o.leido; e.destacado=o.destacado; if(o.resumen) e.resumen=o.resumen; if(o.snooze_until){ e.snooze_until=o.snooze_until; e.snooze_cat=o.snooze_cat||o.cat; } } });
+    if(Array.isArray(s.rules)) RULES = s.rules;
+    if(s.provider) activeProvider = s.provider;
+  }catch(_){ /* estado corrupto: usar semilla */ }
+}
+function reiniciarDemo(){
+  try{ localStorage.removeItem(STORE_KEY); }catch(_){}
+  EMAILS = emailsSemilla(); RULES = reglasSemilla();
+  catActual = 'urgente'; pageSize = 6; searchMode = false;
+  document.getElementById('account-menu').classList.add('hidden');
+  document.querySelectorAll('.pill-btn').forEach((b,i)=>b.classList.toggle('active', ORDEN[i]==='urgente'));
+  document.getElementById('cat-title').textContent = NOMBRES.urgente;
+  document.getElementById('search-bar').classList.add('hidden');
+  ir('inbox'); renderBandeja();
+  toast_show('Demo reiniciada. Datos restaurados.');
+}
+
+/* ── Conexiones (Google + Groq) ──────────────────────────────────────────── */
+const CONN_KEY = 'sinmail.conn.v1';
+let CONN = {nombre:'', email:'', groqKey:'', model:'llama-3.3-70b-versatile'};
+let pendingGoogle = false;
+function cargarConexiones(){
+  try{ const raw = localStorage.getItem(CONN_KEY); if(raw) CONN = Object.assign(CONN, JSON.parse(raw)); }catch(_){}
+}
+function abrirConexiones(){
+  document.getElementById('account-menu').classList.add('hidden');
+  document.getElementById('conn-nombre').value = CONN.nombre;
+  document.getElementById('conn-email').value = CONN.email;
+  document.getElementById('conn-key').value = CONN.groqKey;
+  document.getElementById('conn-model').value = CONN.model;
+  document.getElementById('conn-sheet').classList.remove('hidden');
+}
+function cerrarConexiones(){ document.getElementById('conn-sheet').classList.add('hidden'); pendingGoogle = false; }
+function guardarConexiones(){
+  CONN.nombre = document.getElementById('conn-nombre').value.trim();
+  CONN.email = document.getElementById('conn-email').value.trim();
+  CONN.groqKey = document.getElementById('conn-key').value.trim();
+  CONN.model = document.getElementById('conn-model').value;
+  try{ localStorage.setItem(CONN_KEY, JSON.stringify(CONN)); }catch(_){}
+  document.getElementById('conn-sheet').classList.add('hidden');
+  aplicarCuenta();
+  toast_show('Conexiones guardadas.');
+  if(pendingGoogle){ pendingGoogle = false; entrarDemo('google'); }
+}
+function groqChat(messages, maxTokens){
+  if(!CONN.groqKey) return Promise.reject(new Error('Sin clave de Groq'));
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), 20000);
+  return fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONN.groqKey},
+    body:JSON.stringify({model:CONN.model, messages:messages, max_tokens:maxTokens||300, temperature:0.5}),
+    signal:ctrl.signal
+  }).then(r => {
+    if(!r.ok) throw new Error('Groq '+r.status);
+    return r.json();
+  }).then(d => (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '').trim())
+    .finally(()=>clearTimeout(timer));
+}
+function probarIA(){
+  const key = document.getElementById('conn-key').value.trim();
+  if(!key){ toast_show('Pega tu API key de Groq primero.'); return; }
+  const previa = CONN.groqKey, previoModel = CONN.model;
+  CONN.groqKey = key; CONN.model = document.getElementById('conn-model').value;
+  toast_show('Probando conexión…');
+  groqChat([{role:'user',content:'Responde únicamente: ok'}], 4)
+    .then(()=>toast_show('IA conectada. Respuesta recibida de Groq.'))
+    .catch(err=>{ toast_show('No se pudo conectar: '+err.message); CONN.groqKey = previa; CONN.model = previoModel; });
+}
+
+/* ── Autenticación demo ──────────────────────────────────────────────────── */
+function entrarDemo(provider){
+  if(provider==='google' && !CONN.email){
+    pendingGoogle = true;
+    abrirConexiones();
+    toast_show('Escribe tu cuenta de Google y guarda.');
+    return;
+  }
+  activeProvider = provider;
+  aplicarCuenta();
+  guardar();
+  ir('inbox'); renderBandeja();
+  setTimeout(()=>toast_show(provider==='google' ? 'Conectado con Google (identidad local).' : 'Modo demostración.'), 250);
+}
+function iniciales(n){
+  const p = (n||'').trim().split(/\s+/).filter(Boolean);
+  return p.length ? p.map(x=>x[0]).join('').slice(0,2).toUpperCase() : 'TU';
+}
+function datosCuenta(){
+  return activeProvider==='google'
+    ? {nombre:CONN.nombre||'Cuenta Google', mail:CONN.email||'tu@gmail.com', ini:iniciales(CONN.nombre||'G')}
+    : {nombre:'Rodolfo Ramírez', mail:'rodolfo@sinmail.app', ini:'RR'};
+}
+function aplicarCuenta(){
+  const d = datosCuenta();
+  document.getElementById('active-account').textContent = d.mail;
+  document.getElementById('account-name').textContent = d.nombre.split(' ')[0];
+  document.getElementById('avatar-ini').textContent = d.ini;
+  document.getElementById('profile-name').textContent = d.nombre;
+  document.getElementById('profile-account').textContent = d.mail;
+  document.getElementById('profile-ini').textContent = d.ini;
+  document.getElementById('switch-hint').textContent = activeProvider==='google'?'Ahora: Google':'Ahora: SinMail';
+}
+function toggleAccountMenu(){ document.getElementById('account-menu').classList.toggle('hidden'); }
+function switchAccount(){
+  activeProvider = activeProvider==='sinmail'?'google':'sinmail';
+  aplicarCuenta(); guardar();
+  document.getElementById('account-menu').classList.add('hidden');
+  toast_show(`Cuenta activa: ${datosCuenta().mail}`);
+}
+function cerrarSesion(){ document.getElementById('account-menu').classList.add('hidden'); ir('welcome'); }
+function irCategoria(cat){
+  document.getElementById('account-menu').classList.add('hidden');
+  cambiarCat(cat, document.querySelector('.pill-btn[data-cat="'+cat+'"]'));
+}
+
+/* ── Navegación entre pantallas ──────────────────────────────────────────── */
+function ir(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='reader'){
+    deleteStep = 0; clearTimeout(deleteTimer);
+    const bd = document.getElementById('btn-delete');
+    bd.textContent = 'Eliminar'; bd.classList.remove('danger');
+    document.getElementById('reader-main').classList.remove('focus-mode');
+    focusMode = false;
+    document.getElementById('btn-focus-toggle').textContent = 'Enfocar';
+  }
+}
+function volverBandeja(){ ir('inbox'); renderBandeja(); }
+
+function cambiarCat(cat, btn){
+  catActual = cat;
+  document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('cat-title').textContent = NOMBRES[cat];
+  document.getElementById('presence-copy').textContent = PRESENCIA[cat] || '';
+  pageSize = 6;
+  if(searchMode) toggleSearch();
+  renderBandeja();
+}
+
+/* ── Barra de intención (lenguaje natural) ───────────────────────────────── */
+function aplicarIntencion(){
+  const input = document.getElementById('intent-input');
+  const q = input.value.trim();
+  if(!q){ toast_show('Escribe una intención.'); return; }
+  const n = q.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  let cat = null;
+  if(/sin responder|por responder|esperan? respuesta|responder/.test(n)) cat='por_responder';
+  else if(/para leer|lectura|leer|ensayo/.test(n)) cat='para_leer';
+  else if(/bolet|newsletter|suscrip/.test(n)) cat='boletines';
+  else if(/archivad|archivo/.test(n)) cat='archivo';
+  else if(/sin lugar|no tiene lugar|incertidumbre|otros|sin clasificar/.test(n)) cat='otros';
+  else if(/papelera|eliminad|basura/.test(n)) cat='papelera';
+  else if(/urgente|hoy|importa ahora|ahora/.test(n)) cat='urgente';
+
+  if(cat){
+    catActual = cat; pageSize = 6;
+    document.querySelectorAll('.pill-btn').forEach((b,i)=>b.classList.toggle('active', ORDEN[i]===cat));
+    document.getElementById('cat-title').textContent = NOMBRES[cat];
+    document.getElementById('presence-copy').textContent = 'Según tu intención.';
+    if(searchMode) toggleSearch();
+    renderBandeja();
+    toast_show(`Mostrando: ${NOMBRES[cat]}`);
+  } else {
+    // Búsqueda global por nombre/términos. Ej: "correos de Ana", "facturas".
+    let termino = q.replace(/correos?\s+(de|sobre|para)\s+/i,'').replace(/facturas?/i,'factura').trim();
+    if(!searchMode) toggleSearch();
+    document.getElementById('search-scope').value = 'all';
+    document.getElementById('search-input').value = termino;
+    document.getElementById('cat-title').textContent = 'Buscar';
+    document.getElementById('presence-copy').textContent = 'Resultados de tu intención.';
+    renderBandeja(termino);
+  }
+  input.value = '';
+}
+
+/* ── Render de la bandeja ────────────────────────────────────────────────── */
+function renderBandeja(filtro){
+  let emails;
+  if(searchMode && filtro){
+    emails = EMAILS.filter(e => !esSnoozed(e)); // la búsqueda atraviesa todas las intenciones
+  } else {
+    emails = EMAILS.filter(e => e.cat === catActual && !esSnoozed(e));
+  }
+
+  // Agrupar por hilo: mostrar solo el mensaje más reciente (excepto en papelera)
+  if(catActual !== 'papelera' && !(searchMode && filtro)){
+    const seen = new Map();
+    emails.forEach(e => { if(!seen.has(e.thread_id) || e.id > seen.get(e.thread_id).id) seen.set(e.thread_id, e); });
+    emails = [...seen.values()];
+  }
+  emails.sort((a,b) => b.id - a.id);
+
+  if(filtro){
+    const q = filtro.toLowerCase();
+    const scopeEl = document.getElementById('search-scope');
+    const scope = (scopeEl && scopeEl.value) || 'all';
+    emails = emails.filter(e => {
+      const hay = scope==='sender' ? e.de+' '+e.email
+        : scope==='subject' ? e.asunto
+        : e.de+' '+e.email+' '+e.asunto+' '+e.resumen+' '+e.cuerpo;
+      return hay.toLowerCase().includes(q);
+    });
+  }
+
+  const total = emails.length;
+  emails = emails.slice(0, pageSize);
+
+  const loadMore = document.getElementById('load-more');
+  loadMore.classList.toggle('hidden', total <= pageSize);
+
+  const list = document.getElementById('email-list');
+  const empty = document.getElementById('empty-state');
+  list.innerHTML = '';
+
+  if(emails.length === 0){
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    const [t,s] = EMPTY[catActual] || ['Vacío',''];
+    document.getElementById('empty-title').textContent = filtro ? 'Sin resultados.' : t;
+    document.getElementById('empty-sub').textContent = filtro ? `Nada coincide con “${filtro}”.` : s;
+    actualizarBadges();
+    return;
+  }
+  list.style.display = '';
+  empty.style.display = 'none';
+
+  const esOtros = catActual === 'otros' && !filtro;
+  const esPapelera = catActual === 'papelera' && !filtro;
+
+  emails.forEach(e => {
+    const li = document.createElement('li');
+    li.className = 'email-row' + (esOtros ? ' otros-row' : '');
+    const hilo = e.thread_count > 1 ? `<span class="thread-badge">${e.thread_count}</span>` : '';
+    const star = e.destacado ? '<span class="row-star">★</span>' : '';
+    const restore = esPapelera ? `<button class="row-restore-btn" title="Restaurar" onclick="restaurar(event,${e.id})">↩</button>` : '';
+    li.innerHTML = `
+      <span class="dot ${e.cat}${e.leido?' read':''}"></span>
+      <div class="email-main">
+        <div class="email-top">
+          <span class="email-from">${esc(e.de)}${hilo}</span>
+          <span class="email-date">${esc(e.fecha)}</span>
+        </div>
+        <div class="email-subject${e.leido?' read':''}">${esc(e.asunto)}</div>
+        <div class="email-preview">${esc(e.resumen)}</div>
+      </div>${star}${restore}`;
+    if(e.thread_count > 1 && !esPapelera && !filtro){
+      li.onclick = () => abrirHilo(e.thread_id, e.asunto);
+    } else {
+      li.onclick = () => abrirEmail(e.id);
+    }
+    if(!esPapelera) agregarSwipe(li, e);
+    list.appendChild(li);
+  });
+
+  actualizarBadges();
+}
+
+function actualizarBadges(){
+  const btns = document.querySelectorAll('.pill-btn');
+  ORDEN.forEach((cat,i) => {
+    const btn = btns[i]; if(!btn) return;
+    const badge = btn.querySelector('.badge');
+    const unread = EMAILS.filter(e => e.cat===cat && !e.leido && !esSnoozed(e)).length;
+    if(unread > 0){ badge.textContent = unread; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+  });
+}
+
+function cargarMas(){
+  const b = document.getElementById('load-more');
+  if(b.classList.contains('loading')) return;
+  b.classList.add('loading'); b.textContent = 'Cargando…';
+  setTimeout(() => {
+    pageSize += 6;
+    b.classList.remove('loading'); b.textContent = 'Cargar mensajes anteriores';
+    renderBandeja(searchMode ? document.getElementById('search-input').value : '');
+  }, 450);
+}
+
+/* ── Gestos táctiles ─────────────────────────────────────────────────────── */
+function agregarSwipe(li, e){
+  let sx=0, sy=0, moved=false;
+  li.addEventListener('touchstart', ev => { sx=ev.touches[0].clientX; sy=ev.touches[0].clientY; moved=false; li.style.transition='none'; }, {passive:true});
+  li.addEventListener('touchmove', ev => {
+    const dx=ev.touches[0].clientX-sx, dy=ev.touches[0].clientY-sy;
+    if(!moved && Math.abs(dy)>Math.abs(dx)) return;
+    moved=true;
+    const x=Math.max(-110,Math.min(110,dx));
+    li.style.transform=`translateX(${x}px)`;
+    li.dataset.swipe = dx<-60?'left' : dx>60?'right' : '';
+  }, {passive:true});
+  li.addEventListener('touchend', () => {
+    li.style.transition='transform .2s ease, opacity .2s';
+    li.style.transform='';
+    if(!moved) return;
+    const dir = li.dataset.swipe; li.dataset.swipe='';
+    if(dir==='left'){
+      const prev=e.cat;
+      e.cat='archivo'; e.leido=true; guardar();
+      li.style.opacity='0';
+      setTimeout(()=>renderBandeja(searchMode?document.getElementById('search-input').value:''), 200);
+      toastWithUndo(FRASES[Math.floor(Math.random()*FRASES.length)], ()=>{ e.cat=prev; guardar(); });
+    } else if(dir==='right'){
+      e.destacado=!e.destacado; guardar();
+      const star=li.querySelector('.row-star');
+      if(e.destacado && !star){ const s=document.createElement('span'); s.className='row-star'; s.textContent='★'; li.appendChild(s); }
+      else if(!e.destacado && star) star.remove();
+      toast_show(e.destacado?'★ Destacado':'Quitado de destacados');
+    }
+  });
+}
+
+function restaurar(ev, id){
+  ev.stopPropagation();
+  const e = EMAILS.find(x => x.id===id); if(!e) return;
+  e.cat='otros'; guardar();
+  renderBandeja();
+  toast_show('Correo restaurado a Otros.');
+}
+
+/* ── Lector ──────────────────────────────────────────────────────────────── */
+function abrirEmail(id){
+  const e = EMAILS.find(x => x.id===id); if(!e) return;
+  emailActual = e; e.leido = true; guardar();
+  document.getElementById('r-resumen').textContent = e.resumen;
+  const chip = document.getElementById('r-chip');
+  chip.textContent = NOMBRES[e.cat]; chip.className = `cat-chip chip-${e.cat}`;
+  document.getElementById('r-otros-hint').classList.toggle('hidden', e.cat!=='otros');
+  document.getElementById('r-asunto').textContent = e.asunto;
+  document.getElementById('r-from').textContent = `${e.de} · ${e.email}`;
+  document.getElementById('r-fecha').textContent = e.fecha;
+  document.getElementById('r-body').textContent = e.cuerpo;
+  document.getElementById('reply-instr').value = '';
+  document.getElementById('draft-area').style.display = 'none';
+  document.getElementById('draft-body').value = '';
+  document.getElementById('btn-leido').textContent = 'No leído';
+  document.getElementById('btn-resumir').classList.toggle('hidden', !CONN.groqKey);
+  renderRecatGrid(e.cat);
+  ir('reader');
+}
+
+function abrirHilo(threadId, asunto){
+  const msgs = EMAILS.filter(e => e.thread_id===threadId).sort((a,b)=>a.id-b.id);
+  document.getElementById('thread-title').textContent = asunto || '';
+  document.getElementById('thread-subject').textContent = asunto || '';
+  const list = document.getElementById('thread-list');
+  list.innerHTML = '';
+  msgs.forEach(e => {
+    e.leido = true;
+    const div = document.createElement('div');
+    div.className = 'thread-msg';
+    div.innerHTML = `
+      <div class="thread-msg-hdr"><span class="thread-msg-from">${esc(e.de)}</span><span class="thread-msg-date">${esc(e.fecha)}</span></div>
+      <div class="thread-msg-body">${esc(e.cuerpo)}</div>
+      <div class="thread-msg-actions">
+        <button class="text-btn" onclick="abrirEmail(${e.id})">Abrir y responder</button>
+        <button class="text-btn muted" onclick="archivarMsg(${e.id})">Archivar</button>
+      </div>`;
+    list.appendChild(div);
+  });
+  guardar();
+  ir('thread');
+}
+function archivarMsg(id){
+  const e = EMAILS.find(x => x.id===id);
+  if(e){ e.cat='archivo'; e.leido=true; guardar(); }
+  toast_show('Archivado.');
+  ir('inbox'); renderBandeja();
+}
+
+/* ── Reclasificación manual ──────────────────────────────────────────────── */
+function renderRecatGrid(cat){
+  const g = document.getElementById('recat-grid');
+  g.innerHTML = '';
+  Object.entries(NOMBRES).forEach(([k,v]) => {
+    if(k==='papelera') return;
+    const b = document.createElement('button');
+    b.className = 'recat-btn' + (k===cat ? ' current' : '');
+    b.textContent = v;
+    b.onclick = () => {
+      if(!emailActual || k===emailActual.cat) return;
+      const previo = emailActual.cat;
+      emailActual.cat = k; guardar();
+      const chip = document.getElementById('r-chip');
+      chip.textContent = NOMBRES[k]; chip.className = `cat-chip chip-${k}`;
+      document.getElementById('r-otros-hint').classList.toggle('hidden', k!=='otros');
+      renderRecatGrid(k);
+      if(previo==='otros' && k!=='otros'){
+        RULES.push({id:Date.now(), texto:`Los mensajes de ${emailActual.de} se clasifican como ${NOMBRES[k]}.`, origen:'Sugerida desde Otros', activa:true});
+        guardar();
+        document.getElementById('rules-count').textContent = RULES.filter(r=>r.activa).length;
+        toast_show(`Movido a ${NOMBRES[k]}. SinMail aprendió una regla.`);
+      } else {
+        toast_show(`Movido a ${NOMBRES[k]}`);
+      }
+    };
+    g.appendChild(b);
+  });
+}
+
+/* ── Acciones del lector ─────────────────────────────────────────────────── */
+function toggleLeido(){
+  if(!emailActual) return;
+  emailActual.leido = !emailActual.leido; guardar();
+  document.getElementById('btn-leido').textContent = emailActual.leido ? 'No leído' : 'Leído';
+  toast_show(emailActual.leido ? 'Marcado como leído' : 'Marcado como no leído');
+}
+function archivar(){
+  if(!emailActual) return;
+  const prev = emailActual.cat, ref = emailActual;
+  ref.cat='archivo'; ref.leido=true; guardar();
+  toastWithUndo(FRASES[Math.floor(Math.random()*FRASES.length)], ()=>{ ref.cat=prev; guardar(); });
+  ir('inbox'); renderBandeja();
+}
+function eliminar(){
+  if(!emailActual) return;
+  const btn = document.getElementById('btn-delete');
+  if(deleteStep===0){
+    deleteStep=1; btn.textContent='¿Eliminar?'; btn.classList.add('danger');
+    clearTimeout(deleteTimer);
+    deleteTimer = setTimeout(()=>{ deleteStep=0; btn.textContent='Eliminar'; btn.classList.remove('danger'); }, 3000);
+  } else {
+    clearTimeout(deleteTimer);
+    const prev = emailActual.cat, ref = emailActual;
+    ref.cat='papelera'; ref.leido=true; guardar();
+    toastWithUndo('Movido a papelera.', ()=>{ ref.cat=prev; guardar(); });
+    ir('inbox'); renderBandeja();
+  }
+}
+function toggleFocus(){
+  focusMode = !focusMode;
+  document.getElementById('reader-main').classList.toggle('focus-mode', focusMode);
+  document.getElementById('btn-focus-toggle').textContent = focusMode ? 'Salir de foco' : 'Enfocar';
+}
+function siguienteEnFoco(){
+  if(!emailActual) return;
+  const cola = EMAILS.filter(e => e.cat===emailActual.cat && e.cat!=='papelera').sort((a,b)=>b.id-a.id);
+  const i = cola.findIndex(e => e.id===emailActual.id);
+  const sig = cola[i+1];
+  if(sig){ abrirEmail(sig.id); if(!focusMode) toggleFocus(); }
+  else { toast_show('Has llegado al final de esta intención.'); volverBandeja(); }
+}
+
+/* ── Posponer ────────────────────────────────────────────────────────────── */
+function mostrarSnooze(){ document.getElementById('snooze-modal').classList.remove('hidden'); }
+function cerrarSnooze(){ document.getElementById('snooze-modal').classList.add('hidden'); }
+function aplicarSnooze(cuando){
+  cerrarSnooze();
+  if(!emailActual) return;
+  const hasta = fechaSnooze(cuando);
+  emailActual.snooze_until = hasta.getTime();
+  emailActual.snooze_cat = emailActual.cat;
+  guardar();
+  toast_show(`Volverá ${etiquetaSnooze(cuando, hasta)}.`);
+  ir('inbox'); renderBandeja();
+}
+function fechaSnooze(opcion){
+  const n = new Date();
+  if(opcion==='tarde'){ const d=new Date(n); d.setHours(17,0,0,0); if(d<=n) d.setTime(n.getTime()+3*3600e3); return d; }
+  if(opcion==='manana'){ const d=new Date(n); d.setDate(d.getDate()+1); d.setHours(9,0,0,0); return d; }
+  if(opcion==='semana'){ const d=new Date(n); d.setDate(d.getDate()+(((8-d.getDay())%7)||7)); d.setHours(9,0,0,0); return d; }
+  return new Date(n.getTime()+60e3); // demo: 1 minuto
+}
+function etiquetaSnooze(opcion, d){
+  if(opcion==='tarde') return 'esta tarde a las '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+  if(opcion==='manana') return 'mañana a las 09:00';
+  if(opcion==='semana') return 'el lunes a las 09:00';
+  return 'en un minuto';
+}
+function esSnoozed(e){ return !!e.snooze_until && e.snooze_until > Date.now(); }
+function revisarSnoozes(ahora){
+  const t = ahora || Date.now();
+  const vueltos = [];
+  EMAILS.forEach(e => {
+    if(e.snooze_until && e.snooze_until <= t){
+      e.cat = e.snooze_cat || e.cat;
+      delete e.snooze_until; delete e.snooze_cat;
+      e.leido = false;
+      vueltos.push(e);
+    }
+  });
+  if(vueltos.length){
+    guardar();
+    if(document.getElementById('inbox').classList.contains('active')) renderBandeja();
+    else actualizarBadges();
+    toast_show(vueltos.length===1 ? `Ha vuelto: ${vueltos[0].asunto}` : `Han vuelto ${vueltos.length} correos pospuestos.`);
+  }
+}
+setInterval(()=>revisarSnoozes(), 30e3);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) revisarSnoozes(); });
+
+/* ── Responder / redactar con IA (simulado) ──────────────────────────────── */
+function nombreFirma(){ return (datosCuenta().nombre||'').split(' ')[0] || 'Rodolfo'; }
+function borradorLocal(instr){
+  const saludo = ((emailActual && emailActual.de) || '').split(' ')[0];
+  const drafts = [
+    `Hola${saludo?' '+saludo:''},\n\nGracias por tu mensaje. ${capitalizar(instr)}.\n\nQuedo a tu disposición para cualquier detalle adicional.\n\nUn saludo,\n${nombreFirma()}`,
+    `Buenos días${saludo?' '+saludo:''},\n\n${capitalizar(instr)}. ¿Te parece bien así?\n\nUn cordial saludo,\n${nombreFirma()}`,
+    `Hola${saludo?' '+saludo:''},\n\nRecibido. ${capitalizar(instr)}.\n\nAvísame si necesitas algo más.\n\nSaludos,\n${nombreFirma()}`,
+  ];
+  return drafts[Math.floor(Math.random()*drafts.length)];
+}
+function mostrarBorrador(texto, btn){
+  document.getElementById('draft-body').value = texto;
+  document.getElementById('draft-area').style.display='block';
+  btn.textContent='Generar borrador'; btn.disabled=false;
+}
+function generarBorrador(){
+  const instr = document.getElementById('reply-instr').value.trim();
+  if(!instr){ toast_show('Escribe una instrucción primero.'); return; }
+  const btn = document.getElementById('btn-draft');
+  btn.textContent='Generando…'; btn.disabled=true;
+  if(CONN.groqKey && emailActual){
+    groqChat([
+      {role:'system', content:'Eres SinMail IA. Redacta en español una respuesta cortés y profesional al correo recibido, siguiendo la instrucción del usuario. Mantén el tono del original. Máximo 100 palabras. Devuelve solo el cuerpo del correo, sin asunto ni comentarios. Firma como '+nombreFirma()+'.'},
+      {role:'user', content:'Instrucción: '+instr+'\n\nCorreo original de '+emailActual.de+' ('+emailActual.asunto+'):\n'+(emailActual.cuerpo||'').slice(0,1500)}
+    ], 320)
+      .then(t => mostrarBorrador(t || borradorLocal(instr), btn))
+      .catch(() => { toast_show('IA no disponible; borrador local.'); mostrarBorrador(borradorLocal(instr), btn); });
+  } else {
+    setTimeout(() => mostrarBorrador(borradorLocal(instr), btn), 700);
+  }
+}
+function resumirConIA(){
+  if(!emailActual || !CONN.groqKey) return;
+  const btn = document.getElementById('btn-resumir');
+  btn.textContent='Resumiendo…'; btn.disabled=true;
+  const e = emailActual;
+  groqChat([
+    {role:'system', content:'Eres SinMail IA. Resume el correo en una sola frase en español de máximo 15 palabras: qué necesita el remitente y qué acción se requiere. Sin lenguaje corporativo. Si no hay acción clara responde exactamente: Información sin acción requerida.'},
+    {role:'user', content:'Asunto: '+e.asunto+'\n\n'+(e.cuerpo||'').slice(0,2000)}
+  ], 60)
+    .then(t => {
+      if(t){ e.resumen = t; guardar(); if(emailActual===e) document.getElementById('r-resumen').textContent = t; }
+      btn.textContent='Resumir'; btn.disabled=false;
+    })
+    .catch(err => { toast_show('IA no disponible: '+err.message); btn.textContent='Resumir'; btn.disabled=false; });
+}
+function enviarRespuesta(){
+  if(emailActual){ emailActual.cat='archivo'; emailActual.leido=true; guardar(); }
+  toast_show('Respuesta enviada. Conversación archivada.');
+  ir('inbox'); renderBandeja();
+}
+function enviarCorreo(){
+  const to = document.getElementById('c-to').value.trim();
+  document.getElementById('c-to').value=''; document.getElementById('c-subject').value='';
+  document.getElementById('c-instr').value=''; document.getElementById('c-body').value='';
+  toast_show(to ? `Correo enviado a ${to}.` : 'Correo enviado.');
+  ir('inbox');
+}
+function redactarConIA(){
+  const instr = document.getElementById('c-instr').value.trim();
+  const asunto = document.getElementById('c-subject').value.trim();
+  const body = document.getElementById('c-body');
+  const local = () => {
+    body.value = instr
+      ? `Hola,\n\n${capitalizar(instr)}.\n\nQuedo atento a tu respuesta.\n\nUn saludo,\n${nombreFirma()}`
+      : `Hola,\n\nTe escribo para…\n\nUn saludo,\n${nombreFirma()}`;
+  };
+  toast_show('Redactando con IA…');
+  if(CONN.groqKey && instr){
+    groqChat([
+      {role:'system', content:'Eres SinMail IA. Redacta en español un correo claro y cortés según la instrucción. Máximo 120 palabras. Devuelve solo el cuerpo, sin asunto. Firma como '+nombreFirma()+'.'},
+      {role:'user', content:'Instrucción: '+instr+(asunto?'\nAsunto previsto: '+asunto:'')}
+    ], 350)
+      .then(t => { body.value = t || ''; if(!t) local(); })
+      .catch(() => { toast_show('IA no disponible; borrador local.'); local(); });
+  } else {
+    setTimeout(local, 600);
+  }
+}
+
+/* ── Reglas ──────────────────────────────────────────────────────────────── */
+function abrirReglas(){ toggleAccountMenu(); renderReglas(); ir('rules'); }
+function renderReglas(){
+  const el = document.getElementById('rules-list'); el.innerHTML='';
+  document.getElementById('rules-count').textContent = RULES.filter(r=>r.activa).length;
+  if(RULES.length===0){ el.innerHTML = '<p class="rules-intro">Aún no hay reglas. SinMail las propondrá cuando corrijas la clasificación de un correo.</p>'; return; }
+  RULES.forEach(r => {
+    const d = document.createElement('div'); d.className='rule-card';
+    d.innerHTML = `
+      <div class="rule-icon">IA</div>
+      <div class="rule-main">
+        <div class="rule-title" style="${r.activa?'':'text-decoration:line-through;opacity:.55'}">${esc(r.texto)}</div>
+        <div class="rule-meta">${esc(r.origen)} · ${r.activa?'Activa':'Pausada'}</div>
+      </div>
+      <div class="rule-actions">
+        <button title="${r.activa?'Pausar':'Activar'}" onclick="toggleRule(${r.id})">${r.activa?'❙❙':'▶'}</button>
+        <button title="Eliminar" onclick="deleteRule(${r.id})">×</button>
+      </div>`;
+    el.appendChild(d);
+  });
+}
+function toggleRule(id){
+  const r = RULES.find(x=>x.id===id); if(r) r.activa=!r.activa;
+  guardar(); renderReglas();
+  toast_show(r && r.activa ? 'Regla activada.' : 'Regla pausada.');
+}
+function deleteRule(id){
+  const i = RULES.findIndex(x=>x.id===id); if(i<0) return;
+  const [r] = RULES.splice(i,1); guardar(); renderReglas();
+  toastWithUndo('Regla eliminada.', ()=>{ RULES.splice(i,0,r); guardar(); renderReglas(); });
+}
+
+/* ── Búsqueda ────────────────────────────────────────────────────────────── */
+function toggleSearch(){
+  searchMode = !searchMode;
+  const bar = document.getElementById('search-bar');
+  const btn = document.getElementById('btn-search-toggle');
+  bar.classList.toggle('hidden', !searchMode);
+  btn.classList.toggle('active', searchMode);
+  if(searchMode){
+    document.getElementById('search-input').focus();
+    document.getElementById('cat-title').textContent = 'Buscar';
+  } else {
+    document.getElementById('search-input').value = '';
+    document.getElementById('cat-title').textContent = NOMBRES[catActual];
+    document.getElementById('presence-copy').textContent = PRESENCIA[catActual] || '';
+    renderBandeja();
+  }
+}
+function filtrarBusqueda(q){ renderBandeja(q || ''); }
+
+/* ── Sincronizar (simulado) ──────────────────────────────────────────────── */
+function sincronizar(){
+  if(syncing){ toast_show('La sincronización ya está en curso.'); return; }
+  syncing = true;
+  const b = document.getElementById('sync-btn');
+  b.disabled = true; b.classList.add('syncing');
+  document.getElementById('sync-status').textContent = 'Sincronizando…';
+  setTimeout(() => {
+    syncing = false; b.disabled = false; b.classList.remove('syncing');
+    document.getElementById('sync-status').textContent = 'Actualizado ahora';
+    toast_show('Todo está al día.');
+  }, 1000);
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+function toast_show(msg, ms=3200){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${esc(msg)}</span>`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), ms);
+}
+function toastWithUndo(msg, onUndo){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span style="flex:1">${esc(msg)}</span><button class="toast-undo" id="toast-undo-btn">Deshacer</button>`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 5000);
+  document.getElementById('toast-undo-btn').onclick = () => {
+    clearTimeout(toastTimer); t.classList.remove('show');
+    onUndo();
+    renderBandeja(searchMode?document.getElementById('search-input').value:'');
+    toast_show('Acción revertida.');
+  };
+}
+
+/* ── Utilidades ──────────────────────────────────────────────────────────── */
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+
+/* ── PWA: service worker para uso sin conexión (solo si se sirve por https) ─ */
+try{
+  if('serviceWorker' in navigator && location.protocol==='https:'){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
+}catch(_){}
+window.addEventListener('online', ()=>{ document.getElementById('sync-status').textContent='Con conexión'; });
+window.addEventListener('offline', ()=>{ document.getElementById('sync-status').textContent='Sin conexión'; toast_show('Sin conexión. Tus cambios se conservan.'); });
+
+/* ── Inicializar ─────────────────────────────────────────────────────────── */
+cargarConexiones();
+cargar();
+revisarSnoozes();
+aplicarCuenta();
+renderBandeja();
+</script>
+</body>
+</html>
