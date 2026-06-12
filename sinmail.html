@@ -143,7 +143,6 @@ button{cursor:pointer;background:none;border:none}
 .intent-input{flex:1;border:none;background:transparent;font-size:14px;color:var(--ink);outline:none}
 .intent-go{padding:5px 9px;font-size:12.5px;font-weight:650;color:var(--blue);border:1px solid transparent;border-radius:8px}
 .intent-go:hover{background:var(--blue-soft);border-color:#dce8f5}
-.intent-caption{margin:8px 22px 0;font-size:10.5px;color:var(--subtle)}
 
 /* ── Contenido y jerarquía ───────────────────────────────────────────────── */
 .content{max-width:760px;margin:0 auto;padding-bottom:110px}
@@ -151,9 +150,6 @@ button{cursor:pointer;background:none;border:none}
 .presence-line{display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:0 20px 12px;color:var(--muted);font-size:11.5px}
 .presence-line strong{color:var(--subtle);font-weight:500}
-.hint-chip{display:block;margin:0 20px 12px;font-size:10.5px;color:var(--subtle)}
-.hint-chip kbd{font:inherit;background:#fff;border:1px solid var(--line);border-bottom-width:2px;
-  border-radius:5px;padding:1px 5px;color:var(--muted)}
 
 /* ── Lista de correo ─────────────────────────────────────────────────────── */
 .email-list{list-style:none;margin:0 12px;background:#fff;border:1px solid var(--line);
@@ -217,7 +213,7 @@ button{cursor:pointer;background:none;border:none}
 .pill-btn.active .badge{background:#fff;color:var(--navy)}
 .badge.hidden{display:none}
 /* Riel de intenciones: elementos visibles solo en la barra lateral de escritorio */
-.rail-top,.rail-section,.rail-foot{display:none}
+.rail-top,.rail-section{display:none}
 .pill .i-bar{display:none}
 .pill .full{display:none}.pill .short{display:inline}
 .rail-intentions{display:contents}
@@ -408,9 +404,6 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     min-width:19px;height:18px;padding:0 5px;background:var(--ic-soft);color:var(--ic);
     border:0;border-radius:6px;font-size:10px}
   .pill-btn.active .badge{background:#fff;color:var(--ic)}
-  .rail-foot{display:block;margin-top:auto;padding:18px 10px 2px}
-  .rail-tag{font-size:11.5px;line-height:1.5;color:var(--subtle)}
-  .rail-tag b{color:var(--muted);font-weight:600}
   .content,.intent-shell,.search-bar{max-width:820px}
   .content{padding-bottom:48px}
   .toast{bottom:30px;left:calc(50% + 134px)}
@@ -448,7 +441,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     </svg>
     <div class="wc-wm"><span class="wm-sin">sin</span><span class="wm-mail">mail</span></div>
     <p class="wc-tagline">Un mail, sin el caos.</p>
-    <p class="wc-sub">Menos ruido. Más presencia. Eliges una intención, no abres una bandeja infinita.</p>
+    <p class="wc-sub">Menos ruido. Más presencia.</p>
     <div class="auth-stack">
       <button class="btn-native" onclick="entrarDemo('sinmail')">Crear correo @sinmail.app</button>
       <button class="btn-google" onclick="entrarDemo('google')">
@@ -456,7 +449,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
         Continuar con Google
       </button>
     </div>
-    <p class="wc-note">Prototipo interactivo y autocontenido de la experiencia SinMail. Tus cambios se guardan en este navegador; la operación real requiere backend, OAuth e infraestructura de correo.</p>
+    <p class="wc-note">Prototipo interactivo. Tus cambios se guardan solo en este navegador.</p>
   </div>
 </div>
 
@@ -472,7 +465,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
         <span class="wordmark"><span class="wm-sin">Sin</span><span class="wm-mail">Mail</span></span>
       </div>
       <div class="topbar-actions">
-        <button class="icon-btn" id="btn-search-toggle" onclick="toggleSearch()" title="Buscar (/)" aria-label="Buscar">
+        <button class="icon-btn" id="btn-search-toggle" onclick="toggleSearch()" title="Buscar" aria-label="Buscar">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
         <button class="icon-btn" id="btn-compose-top" onclick="ir('composer')" title="Redactar" aria-label="Redactar">
@@ -503,13 +496,11 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
       <input id="intent-input" class="intent-input" placeholder="¿Qué necesitas atender?" onkeydown="if(event.key==='Enter')aplicarIntencion()" aria-label="Barra de intención">
       <button class="intent-go" onclick="aplicarIntencion()">Ordenar</button>
     </div>
-    <p class="intent-caption">Prueba: “lo urgente de hoy”, “sin responder”, “para leer”, “facturas” o “correos de Ana”.</p>
   </div>
 
   <main class="content">
     <h2 id="cat-title" class="big-title">Urgente</h2>
     <div class="presence-line"><span id="presence-copy">Veamos lo esencial.</span><strong id="sync-status">Actualizado ahora</strong></div>
-    <span class="hint-chip">Buscar <kbd>/</kbd> · Enfocar <kbd>F</kbd> · Archivar <kbd>E</kbd> · Volver <kbd>Esc</kbd></span>
     <ul id="email-list" class="email-list" aria-live="polite"></ul>
     <button id="load-more" class="btn-load-more hidden" onclick="cargarMas()">Cargar mensajes anteriores</button>
     <div id="empty-state" class="empty" style="display:none">
@@ -545,7 +536,6 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
       <button class="pill-btn" data-cat="otros" onclick="cambiarCat('otros',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Otros</span><span class="short">Otros</span></span><span class="badge hidden"></span></button>
       <button class="pill-btn" data-cat="papelera" onclick="cambiarCat('papelera',this)"><span class="i-bar"></span><span class="i-name"><span class="full">Papelera</span><span class="short">Papelera</span></span><span class="badge hidden"></span></button>
     </div>
-    <div class="rail-foot"><p class="rail-tag">Eliges una <b>intención</b>,<br>no abres una bandeja.</p></div>
   </nav>
 </div>
 
@@ -558,7 +548,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
         Volver
       </button>
       <div class="topbar-actions">
-        <button class="text-btn muted" id="btn-focus-toggle" onclick="toggleFocus()" title="Modo foco (F)">Enfocar</button>
+        <button class="text-btn muted" id="btn-focus-toggle" onclick="toggleFocus()" title="Modo foco">Enfocar</button>
         <button class="icon-btn" onclick="mostrarSnooze()" title="Posponer" aria-label="Posponer">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </button>
@@ -572,7 +562,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     <div class="ai-card">
       <div class="ai-card-hdr"><span class="ai-badge">IA</span><span id="r-chip" class="cat-chip"></span></div>
       <p id="r-resumen" class="ai-resumen"></p>
-      <p id="r-otros-hint" class="otros-hint hidden">La IA no encontró un lugar claro para este mensaje. Muévelo a la categoría que corresponda y aprenderá la regla.</p>
+      <p id="r-otros-hint" class="otros-hint hidden">Sin lugar claro. Muévelo y SinMail aprenderá.</p>
     </div>
     <h2 id="r-asunto" class="reader-subject"></h2>
     <div class="reader-meta"><span id="r-from" class="meta-from"></span><span id="r-fecha" class="meta-date"></span></div>
@@ -629,7 +619,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     </div>
   </header>
   <main class="rules-wrap">
-    <p class="rules-intro">SinMail aprende con prudencia. Aquí puedes revisar, pausar o borrar lo que ha aprendido de tus correcciones. El control final siempre es tuyo.</p>
+    <p class="rules-intro">Revisa, pausa o borra lo que SinMail ha aprendido de tus correcciones.</p>
     <div id="rules-list"></div>
   </main>
 </div>
@@ -864,7 +854,7 @@ function entrarDemo(provider){
   aplicarCuenta();
   guardar();
   ir('inbox'); renderBandeja();
-  setTimeout(()=>toast_show(provider==='google'?'Google conectado en modo demostración.':'Cuenta SinMail abierta en modo demostración.'), 250);
+  setTimeout(()=>toast_show('Modo demostración.'), 250);
 }
 function datosCuenta(){
   return activeProvider==='google'
@@ -1363,30 +1353,6 @@ function toastWithUndo(msg, onUndo){
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
-/* ── Atajos de teclado ───────────────────────────────────────────────────── */
-document.addEventListener('keydown', e => {
-  const ae = document.activeElement;
-  const typing = !!ae && ['INPUT','TEXTAREA','SELECT'].indexOf(ae.tagName) !== -1;
-  const readerActive = document.getElementById('reader').classList.contains('active');
-  const inboxActive = document.getElementById('inbox').classList.contains('active');
-
-  if(e.key==='Escape'){
-    if(!document.getElementById('snooze-modal').classList.contains('hidden')) cerrarSnooze();
-    else if(!document.getElementById('account-menu').classList.contains('hidden')) toggleAccountMenu();
-    else if(readerActive) volverBandeja();
-    else if(document.getElementById('thread').classList.contains('active')) ir('inbox');
-    else if(document.getElementById('composer').classList.contains('active')) ir('inbox');
-    else if(document.getElementById('rules').classList.contains('active')) ir('inbox');
-    else if(searchMode) toggleSearch();
-    return;
-  }
-  if(typing) return;
-  if((e.key==='f'||e.key==='F') && readerActive) toggleFocus();
-  else if((e.key==='e'||e.key==='E') && readerActive && emailActual) archivar();
-  else if((e.key==='j'||e.key==='J') && readerActive) siguienteEnFoco();
-  else if(e.key==='/' && inboxActive){ e.preventDefault(); if(!searchMode) toggleSearch(); else document.getElementById('search-input').focus(); }
-});
-
 /* ── PWA mínima (manifest embebido) ──────────────────────────────────────── */
 try{
   const manifest = {name:'SinMail', short_name:'SinMail', start_url:'.', display:'standalone',
@@ -1395,7 +1361,7 @@ try{
   const link = document.createElement('link'); link.rel='manifest'; link.href=url; document.head.appendChild(link);
 }catch(_){}
 window.addEventListener('online', ()=>{ document.getElementById('sync-status').textContent='Con conexión'; });
-window.addEventListener('offline', ()=>{ document.getElementById('sync-status').textContent='Sin conexión'; toast_show('Estás sin conexión. Tus cambios locales se conservan.'); });
+window.addEventListener('offline', ()=>{ document.getElementById('sync-status').textContent='Sin conexión'; toast_show('Sin conexión. Tus cambios se conservan.'); });
 
 /* ── Inicializar ─────────────────────────────────────────────────────────── */
 cargar();
