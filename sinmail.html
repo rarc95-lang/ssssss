@@ -18,22 +18,26 @@
    Dirección visual institucional y serena. Una sola fuente de verdad.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{
-  --bg:#f4f6f8; --surface:#ffffff; --surface-2:#f8fafc;
-  --ink:#172033; --ink-2:#344054; --muted:#667085; --subtle:#98a2b3;
-  --line:#e4e7ec; --line-strong:#d0d5dd;
-  --navy:#17375e; --blue:#2457a6; --blue-soft:#eef4fb;
-  --danger:#b42318; --danger-soft:#fff1f0; --success:#067647; --warning:#b54708;
-  --c-urgente:#d92d20; --c-por_responder:#2457a6; --c-para_leer:#079455;
-  --c-boletines:#dc6803; --c-archivo:#98a2b3; --c-otros:#667085; --c-papelera:#98a2b3;
+  --bg:#f3f6fd; --surface:#ffffff; --surface-2:#f5f8fe;
+  --ink:#19233a; --ink-2:#3a4a60; --muted:#697587; --subtle:#9aa6ba;
+  --line:#e7ecf6; --line-strong:#d4dcec;
+  --navy:#1e40af; --blue:#2563eb; --blue-soft:#eaf1ff;
+  --indigo:#4f46e5; --brand-grad:linear-gradient(135deg,#5bb0ff 0%,#4f6ef7 100%);
+  --danger:#e11d48; --danger-soft:#fff0f3; --success:#15a34a; --success-soft:#e9fbf0;
+  --warning:#d97706; --warning-soft:#fff6e9; --violet:#7c3aed; --violet-soft:#f1ecfe;
+  --c-urgente:#f04438; --c-por_responder:#3b82f6; --c-para_leer:#16a34a;
+  --c-boletines:#f59e0b; --c-archivo:#9aa6ba; --c-otros:#8b5cf6; --c-papelera:#9aa6ba;
   --radius:12px; --ease:cubic-bezier(.2,.8,.2,1);
-  --shadow-sm:0 1px 2px rgba(16,24,40,.04);
-  --shadow:0 18px 50px rgba(16,24,40,.08);
+  --shadow-sm:0 1px 2px rgba(30,64,175,.05);
+  --shadow:0 18px 50px rgba(30,64,175,.10);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg)}
 body{
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:var(--bg); color:var(--ink); font-size:15px; line-height:1.5;
+  background:radial-gradient(1100px 560px at 50% -8%, #e4edff 0%, rgba(228,237,255,0) 58%), var(--bg);
+  background-attachment:fixed;
+  color:var(--ink); font-size:15px; line-height:1.5;
   letter-spacing:-.006em; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 button,input,textarea,select{font:inherit;color:inherit}
@@ -48,17 +52,16 @@ button{cursor:pointer;background:none;border:none}
 
 /* ── Marca / logo ────────────────────────────────────────────────────────── */
 .brand{display:flex;align-items:center;gap:10px}
-.logo{background:#fff;border:1.5px solid var(--navy);border-radius:50%;position:relative;flex-shrink:0}
-.logo::after{content:'';position:absolute;top:50%;left:23%;width:54%;height:2px;background:var(--navy);border-radius:99px;transform:translateY(-50%) rotate(-14deg)}
-.logo-sm{width:30px;height:30px}
-.logo-lg{width:56px;height:56px}
-.logo-lg::after{height:3px}
+.logo{display:block;flex-shrink:0}
+.logo-sm{width:30px;height:30px;filter:drop-shadow(0 3px 8px rgba(79,110,247,.30))}
+.logo-lg{width:56px;height:56px;filter:drop-shadow(0 10px 22px rgba(79,110,247,.32))}
 .wordmark{font-size:17px;font-weight:650;letter-spacing:-.035em}
 .wm-sin{color:var(--navy)}.wm-mail{color:var(--ink);font-weight:450}
 
 /* ── Bienvenida ──────────────────────────────────────────────────────────── */
 .wc{width:100%;max-width:470px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;
-  padding:48px;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+  padding:48px;background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  box-shadow:0 30px 70px rgba(79,110,247,.16), 0 2px 10px rgba(30,64,175,.05)}
 .wc-kicker{margin-bottom:22px;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--blue)}
 .wc .logo-lg{margin-bottom:24px}
 .wc-wm{font-size:30px;font-weight:650;letter-spacing:-.045em;line-height:1}
@@ -67,8 +70,8 @@ button{cursor:pointer;background:none;border:none}
 .auth-stack{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:34px}
 .btn-native,.btn-google{min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;
   border-radius:10px;font-size:14px;font-weight:600;transition:background .16s var(--ease),border-color .16s var(--ease)}
-.btn-native{background:var(--navy);color:#fff;border:1px solid var(--navy)}
-.btn-native:hover{background:#102c4d}
+.btn-native{background:var(--brand-grad);color:#fff;border:1px solid transparent;box-shadow:0 8px 20px rgba(79,110,247,.28)}
+.btn-native:hover{filter:brightness(1.05);box-shadow:0 10px 26px rgba(79,110,247,.34)}
 .btn-google{background:#fff;color:var(--ink);border:1px solid var(--line-strong)}
 .btn-google:hover{background:var(--surface-2);border-color:#b8c0cc}
 .wc-note{margin-top:16px;font-size:11.5px;color:var(--subtle);line-height:1.55}
@@ -99,7 +102,7 @@ button{cursor:pointer;background:none;border:none}
   transition:background .14s var(--ease),border-color .14s var(--ease)}
 .account-button:hover{background:var(--surface-2);border-color:var(--line-strong)}
 .avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
-  background:var(--navy);color:#fff;font-size:10px;font-weight:650;flex:0 0 auto}
+  background:var(--brand-grad);color:#fff;font-size:10px;font-weight:650;flex:0 0 auto}
 .account-copy{display:flex;flex-direction:column;min-width:0;text-align:left}
 .account-name{display:block;font-size:11.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .account-mail{display:block;font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -190,7 +193,7 @@ button{cursor:pointer;background:none;border:none}
 .pill-btn{position:relative;min-height:36px;padding:8px 11px;border-radius:8px;font-size:11px;font-weight:550;
   color:var(--muted);white-space:nowrap;flex-shrink:0}
 .pill-btn:hover{background:var(--surface-2);color:var(--ink)}
-.pill-btn.active{background:var(--navy);color:#fff}
+.pill-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.28)}
 .badge{position:absolute;top:3px;right:3px;min-width:13px;height:13px;padding:0 3px;
   background:#e9eef5;color:var(--ink-2);border:1px solid #fff;border-radius:99px;
   font-size:8px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1}
@@ -207,9 +210,10 @@ button{cursor:pointer;background:none;border:none}
 .cat-chip{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:2px 6px}
 .chip-urgente{background:var(--danger-soft);color:var(--danger)}
 .chip-por_responder{background:var(--blue-soft);color:var(--blue)}
-.chip-para_leer{background:#ecfdf3;color:var(--success)}
-.chip-boletines{background:#fff6ed;color:var(--warning)}
-.chip-archivo,.chip-otros,.chip-papelera{background:#f2f4f7;color:var(--muted)}
+.chip-para_leer{background:var(--success-soft);color:var(--success)}
+.chip-boletines{background:var(--warning-soft);color:var(--warning)}
+.chip-otros{background:var(--violet-soft);color:var(--violet)}
+.chip-archivo,.chip-papelera{background:#eef1f7;color:var(--muted)}
 .ai-resumen{font-size:13px;line-height:1.55;color:var(--ink-2)}
 .otros-hint{font-size:12px;color:var(--subtle);margin-top:6px}
 .reader-subject{font-size:25px;font-weight:650;letter-spacing:-.04em;line-height:1.2;color:var(--ink)}
@@ -229,10 +233,10 @@ button{cursor:pointer;background:none;border:none}
 textarea{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;
   font-size:14.5px;color:var(--ink);resize:vertical;margin-bottom:10px;line-height:1.55}
 textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87,166,.08)}
-.btn-primary{width:100%;background:var(--navy);color:#fff;border-radius:9px;padding:13px 20px;
-  font-size:14.5px;font-weight:600;margin-bottom:10px}
-.btn-primary:hover{background:#102c4d}
-.btn-send{background:var(--blue)}.btn-send:hover{background:#1d4a8e}
+.btn-primary{width:100%;background:var(--brand-grad);color:#fff;border-radius:10px;padding:13px 20px;
+  font-size:14.5px;font-weight:600;margin-bottom:10px;box-shadow:0 8px 20px rgba(79,110,247,.26)}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-send{background:var(--success);box-shadow:0 8px 20px rgba(21,163,74,.24)}.btn-send:hover{filter:brightness(1.05)}
 .focus-bar{display:none;align-items:center;justify-content:space-between;gap:12px;
   padding-top:20px;margin-top:4px;border-top:1px solid var(--line)}
 .reader-main.focus-mode .ai-card,.reader-main.focus-mode .recat-section,.reader-main.focus-mode .reply-section{display:none}
@@ -262,8 +266,8 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
 .btn-ai{border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:500;
   color:var(--blue);background:#fff;white-space:nowrap}
 .btn-ai:hover{background:var(--blue-soft);border-color:#dce8f5}
-.btn-send-inline{background:var(--navy);border-radius:9px;padding:7px 16px;font-size:14px;font-weight:600;color:#fff}
-.btn-send-inline:hover{background:#102c4d}
+.btn-send-inline{background:var(--brand-grad);border-radius:9px;padding:7px 16px;font-size:14px;font-weight:600;color:#fff;box-shadow:0 6px 16px rgba(79,110,247,.26)}
+.btn-send-inline:hover{filter:brightness(1.05)}
 .compose-body{width:100%;border:none;padding:20px 16px;font-size:15px;color:var(--ink);resize:none;
   min-height:280px;line-height:1.7;background:transparent;border-radius:0;margin:0}
 .compose-body:focus{outline:none;box-shadow:none}
@@ -359,11 +363,22 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
 </head>
 <body>
 
+<!-- Definiciones SVG compartidas (degradado de marca) -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
+  <linearGradient id="sinmail-grad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#5bb0ff"/>
+    <stop offset="1" stop-color="#4f6ef7"/>
+  </linearGradient>
+</defs></svg>
+
 <!-- ═══ BIENVENIDA ═══ -->
 <div id="welcome" class="screen active">
   <div class="wc">
     <p class="wc-kicker">CORREO POR INTENCIÓN</p>
-    <div class="logo logo-lg"></div>
+    <svg class="logo logo-lg" viewBox="0 0 32 32" role="img" aria-label="SinMail">
+      <circle cx="16" cy="16" r="14" fill="url(#sinmail-grad)"/>
+      <path d="M9 23 23 9" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+    </svg>
     <div class="wc-wm"><span class="wm-sin">sin</span><span class="wm-mail">mail</span></div>
     <p class="wc-tagline">Un mail, sin el caos.</p>
     <p class="wc-sub">Menos ruido. Más presencia. Eliges una intención, no abres una bandeja infinita.</p>
@@ -383,7 +398,10 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="SinMail">
-        <div class="logo logo-sm"></div>
+        <svg class="logo logo-sm" viewBox="0 0 32 32" role="img" aria-label="SinMail">
+          <circle cx="16" cy="16" r="14" fill="url(#sinmail-grad)"/>
+          <path d="M9 23 23 9" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+        </svg>
         <span class="wordmark"><span class="wm-sin">Sin</span><span class="wm-mail">Mail</span></span>
       </div>
       <div class="topbar-actions">
