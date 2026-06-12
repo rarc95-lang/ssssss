@@ -78,7 +78,7 @@ button{cursor:pointer;background:none;border:none}
 .wm-sin{color:var(--navy)}.wm-mail{color:var(--ink);font-weight:450}
 
 /* ── Bienvenida ──────────────────────────────────────────────────────────── */
-.wc{width:100%;max-width:470px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;
+.wc{width:100%;max-width:470px;display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:48px;background:var(--surface);border:1px solid var(--line);border-radius:24px;
   box-shadow:0 30px 70px rgba(79,110,247,.16), 0 2px 10px rgba(30,64,175,.05)}
 .wc-kicker{margin-bottom:22px;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--blue)}
@@ -205,8 +205,9 @@ button{cursor:pointer;background:none;border:none}
   padding:8px 10px calc(8px + env(safe-area-inset-bottom));overflow-x:auto;scrollbar-width:none;
   background:rgba(255,255,255,.98);border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(16,24,40,.05)}
 .pill::-webkit-scrollbar{display:none}
-.pill-btn{position:relative;min-height:36px;padding:8px 11px;border-radius:8px;font-size:11px;font-weight:550;
-  color:var(--muted);white-space:nowrap;flex-shrink:0}
+.pill-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:1 1 0;
+  min-height:40px;padding:8px 4px;border-radius:10px;font-size:11px;font-weight:550;
+  color:var(--muted);white-space:nowrap}
 .pill-btn:hover{background:var(--surface-2);color:var(--ink)}
 .pill-btn.active{background:var(--ic-soft,#eaf1ff);color:var(--ink);font-weight:650;box-shadow:inset 0 0 0 1px var(--ic,#8db4f5)}
 .badge{position:absolute;top:3px;right:3px;min-width:13px;height:13px;padding:0 3px;
@@ -341,6 +342,18 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
 .menu-item small{color:var(--subtle)}
 .menu-item.danger{color:var(--danger)}
 
+/* ── Conexiones (Google + IA) ────────────────────────────────────────────── */
+.conn-body{padding:2px 12px 10px}
+.conn-label{display:block;margin:12px 2px 6px;font-size:10.5px;font-weight:650;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--subtle)}
+.conn-input,.conn-select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:14px;background:#fff;color:var(--ink);outline:none}
+.conn-input:focus,.conn-select:focus{border-color:#9db4e8;box-shadow:0 0 0 3px rgba(111,131,240,.10)}
+.conn-note{margin:12px 2px 4px;font-size:11px;line-height:1.5;color:var(--subtle)}
+.conn-actions{display:flex;gap:8px;margin-top:14px}
+.conn-actions .btn-primary{margin-bottom:0;flex:1}
+.conn-actions .text-btn{flex:0 0 auto;align-self:center}
+
 /* Móvil/tablet: solo 5 intenciones en la barra; Archivo y Papelera van al menú */
 @media(max-width:1079px){
   .pill-btn[data-cat=archivo],.pill-btn[data-cat=papelera]{display:none}
@@ -400,9 +413,9 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
   .rail-intentions{display:flex;flex-direction:column;gap:2px;margin-top:4px}
   .rail-section{display:block;padding:16px 10px 6px;font-size:10px;font-weight:700;letter-spacing:.12em;
     text-transform:uppercase;color:var(--subtle)}
-  .pill-btn{position:relative;display:flex;align-items:center;gap:11px;width:100%;min-height:42px;
-    padding:9px 12px 9px 9px;border-radius:10px;text-align:left;font-size:13.5px;font-weight:550;
-    color:var(--ink-2);white-space:normal;box-shadow:none}
+  .pill-btn{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:11px;flex:none;
+    width:100%;min-height:42px;padding:9px 12px 9px 9px;border-radius:10px;text-align:left;
+    font-size:13.5px;font-weight:550;color:var(--ink-2);white-space:normal;box-shadow:none}
   .pill .i-bar{display:block;width:4px;height:17px;border-radius:99px;background:var(--ic);opacity:.5;flex-shrink:0;transition:opacity .15s}
   .pill .i-name{flex:1;min-width:0}
   .pill .full{display:inline}.pill .short{display:none}
@@ -570,7 +583,7 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
   </header>
   <main class="reader-content reader-main" id="reader-main">
     <div class="ai-card">
-      <div class="ai-card-hdr"><span class="ai-badge">IA</span><span id="r-chip" class="cat-chip"></span></div>
+      <div class="ai-card-hdr"><span class="ai-badge">IA</span><span id="r-chip" class="cat-chip"></span><button id="btn-resumir" class="text-btn hidden" style="margin-left:auto;padding:3px 8px;font-size:12px" onclick="resumirConIA()">Resumir</button></div>
       <p id="r-resumen" class="ai-resumen"></p>
       <p id="r-otros-hint" class="otros-hint hidden">Sin lugar claro. Muévelo y SinMail aprenderá.</p>
     </div>
@@ -682,10 +695,39 @@ textarea:focus{outline:none;border-color:#8aa9cf;box-shadow:0 0 0 3px rgba(36,87
     <button class="menu-item menu-mobile-only" onclick="irCategoria('archivo')"><span>Archivo</span><small>Sin urgencia</small></button>
     <button class="menu-item menu-mobile-only" onclick="irCategoria('papelera')"><span>Papelera</span><small>30 días</small></button>
     <button class="menu-item" onclick="abrirReglas()"><span>Reglas de clasificación</span><small id="rules-count">2</small></button>
-    <button class="menu-item" onclick="toast_show('Las preferencias de privacidad e IA estarán disponibles en la versión conectada.')"><span>Privacidad e IA</span><small>Control</small></button>
+    <button class="menu-item" onclick="abrirConexiones()"><span>Conexiones</span><small>Google · Groq</small></button>
     <div class="menu-sep"></div>
     <button class="menu-item" onclick="reiniciarDemo()"><span>Reiniciar demo</span><small>Restaurar datos</small></button>
     <button class="menu-item danger" onclick="cerrarSesion()"><span>Cerrar sesión</span></button>
+  </div>
+</div>
+
+<!-- ═══ CONEXIONES (Google + IA) ═══ -->
+<div id="conn-sheet" class="sheet-menu hidden" onclick="if(event.target===this)cerrarConexiones()">
+  <div class="sheet-panel">
+    <div class="profile-head">
+      <span class="avatar">⚙︎</span>
+      <div><div class="profile-title">Conexiones</div><div class="profile-sub">Se guardan solo en este dispositivo.</div></div>
+    </div>
+    <div class="menu-sep"></div>
+    <div class="conn-body">
+      <label class="conn-label" for="conn-nombre">Nombre</label>
+      <input id="conn-nombre" class="conn-input" type="text" autocomplete="name">
+      <label class="conn-label" for="conn-email">Cuenta de Google</label>
+      <input id="conn-email" class="conn-input" type="email" placeholder="tu@gmail.com" autocomplete="email">
+      <label class="conn-label" for="conn-key">Groq API key</label>
+      <input id="conn-key" class="conn-input" type="password" placeholder="gsk_…" autocomplete="off">
+      <label class="conn-label" for="conn-model">Modelo de IA</label>
+      <select id="conn-model" class="conn-select">
+        <option value="llama-3.3-70b-versatile">Llama 3.3 70B · mejor calidad</option>
+        <option value="llama-3.1-8b-instant">Llama 3.1 8B · más rápido</option>
+      </select>
+      <p class="conn-note">Con la clave de Groq, los borradores, la redacción y los resúmenes usan IA real. Sin ella, SinMail simula la IA. La identidad de Google personaliza tu cuenta (la sincronización real requiere OAuth).</p>
+      <div class="conn-actions">
+        <button class="text-btn" onclick="probarIA()">Probar IA</button>
+        <button class="btn-primary" onclick="guardarConexiones()">Guardar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -835,7 +877,7 @@ const FRASES = ['Cerrado.','Resuelto.','Guardado.','Ciclo completado.','Todo en 
 function guardar(){
   try{
     const overrides = {};
-    EMAILS.forEach(e => { overrides[e.id] = {cat:e.cat, leido:e.leido, destacado:e.destacado, snooze_until:e.snooze_until||null, snooze_cat:e.snooze_cat||null}; });
+    EMAILS.forEach(e => { overrides[e.id] = {cat:e.cat, leido:e.leido, destacado:e.destacado, snooze_until:e.snooze_until||null, snooze_cat:e.snooze_cat||null, resumen:e.resumen}; });
     localStorage.setItem(STORE_KEY, JSON.stringify({overrides, rules:RULES, provider:activeProvider}));
   }catch(_){ /* almacenamiento no disponible: el demo sigue en memoria */ }
 }
@@ -844,7 +886,7 @@ function cargar(){
     const raw = localStorage.getItem(STORE_KEY);
     if(!raw) return;
     const s = JSON.parse(raw);
-    if(s.overrides) EMAILS.forEach(e => { const o = s.overrides[e.id]; if(o){ e.cat=o.cat; e.leido=o.leido; e.destacado=o.destacado; if(o.snooze_until){ e.snooze_until=o.snooze_until; e.snooze_cat=o.snooze_cat||o.cat; } } });
+    if(s.overrides) EMAILS.forEach(e => { const o = s.overrides[e.id]; if(o){ e.cat=o.cat; e.leido=o.leido; e.destacado=o.destacado; if(o.resumen) e.resumen=o.resumen; if(o.snooze_until){ e.snooze_until=o.snooze_until; e.snooze_cat=o.snooze_cat||o.cat; } } });
     if(Array.isArray(s.rules)) RULES = s.rules;
     if(s.provider) activeProvider = s.provider;
   }catch(_){ /* estado corrupto: usar semilla */ }
@@ -861,17 +903,80 @@ function reiniciarDemo(){
   toast_show('Demo reiniciada. Datos restaurados.');
 }
 
+/* ── Conexiones (Google + Groq) ──────────────────────────────────────────── */
+const CONN_KEY = 'sinmail.conn.v1';
+let CONN = {nombre:'', email:'', groqKey:'', model:'llama-3.3-70b-versatile'};
+let pendingGoogle = false;
+function cargarConexiones(){
+  try{ const raw = localStorage.getItem(CONN_KEY); if(raw) CONN = Object.assign(CONN, JSON.parse(raw)); }catch(_){}
+}
+function abrirConexiones(){
+  document.getElementById('account-menu').classList.add('hidden');
+  document.getElementById('conn-nombre').value = CONN.nombre;
+  document.getElementById('conn-email').value = CONN.email;
+  document.getElementById('conn-key').value = CONN.groqKey;
+  document.getElementById('conn-model').value = CONN.model;
+  document.getElementById('conn-sheet').classList.remove('hidden');
+}
+function cerrarConexiones(){ document.getElementById('conn-sheet').classList.add('hidden'); pendingGoogle = false; }
+function guardarConexiones(){
+  CONN.nombre = document.getElementById('conn-nombre').value.trim();
+  CONN.email = document.getElementById('conn-email').value.trim();
+  CONN.groqKey = document.getElementById('conn-key').value.trim();
+  CONN.model = document.getElementById('conn-model').value;
+  try{ localStorage.setItem(CONN_KEY, JSON.stringify(CONN)); }catch(_){}
+  document.getElementById('conn-sheet').classList.add('hidden');
+  aplicarCuenta();
+  toast_show('Conexiones guardadas.');
+  if(pendingGoogle){ pendingGoogle = false; entrarDemo('google'); }
+}
+function groqChat(messages, maxTokens){
+  if(!CONN.groqKey) return Promise.reject(new Error('Sin clave de Groq'));
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), 20000);
+  return fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+CONN.groqKey},
+    body:JSON.stringify({model:CONN.model, messages:messages, max_tokens:maxTokens||300, temperature:0.5}),
+    signal:ctrl.signal
+  }).then(r => {
+    if(!r.ok) throw new Error('Groq '+r.status);
+    return r.json();
+  }).then(d => (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content || '').trim())
+    .finally(()=>clearTimeout(timer));
+}
+function probarIA(){
+  const key = document.getElementById('conn-key').value.trim();
+  if(!key){ toast_show('Pega tu API key de Groq primero.'); return; }
+  const previa = CONN.groqKey, previoModel = CONN.model;
+  CONN.groqKey = key; CONN.model = document.getElementById('conn-model').value;
+  toast_show('Probando conexión…');
+  groqChat([{role:'user',content:'Responde únicamente: ok'}], 4)
+    .then(()=>toast_show('IA conectada. Respuesta recibida de Groq.'))
+    .catch(err=>{ toast_show('No se pudo conectar: '+err.message); CONN.groqKey = previa; CONN.model = previoModel; });
+}
+
 /* ── Autenticación demo ──────────────────────────────────────────────────── */
 function entrarDemo(provider){
+  if(provider==='google' && !CONN.email){
+    pendingGoogle = true;
+    abrirConexiones();
+    toast_show('Escribe tu cuenta de Google y guarda.');
+    return;
+  }
   activeProvider = provider;
   aplicarCuenta();
   guardar();
   ir('inbox'); renderBandeja();
-  setTimeout(()=>toast_show('Modo demostración.'), 250);
+  setTimeout(()=>toast_show(provider==='google' ? 'Conectado con Google (identidad local).' : 'Modo demostración.'), 250);
+}
+function iniciales(n){
+  const p = (n||'').trim().split(/\s+/).filter(Boolean);
+  return p.length ? p.map(x=>x[0]).join('').slice(0,2).toUpperCase() : 'TU';
 }
 function datosCuenta(){
   return activeProvider==='google'
-    ? {nombre:'Rodolfo Ramírez', mail:'rodolfo.demo@gmail.com', ini:'RR'}
+    ? {nombre:CONN.nombre||'Cuenta Google', mail:CONN.email||'tu@gmail.com', ini:iniciales(CONN.nombre||'G')}
     : {nombre:'Rodolfo Ramírez', mail:'rodolfo@sinmail.app', ini:'RR'};
 }
 function aplicarCuenta(){
@@ -1121,6 +1226,7 @@ function abrirEmail(id){
   document.getElementById('draft-area').style.display = 'none';
   document.getElementById('draft-body').value = '';
   document.getElementById('btn-leido').textContent = 'No leído';
+  document.getElementById('btn-resumir').classList.toggle('hidden', !CONN.groqKey);
   renderRecatGrid(e.cat);
   ir('reader');
 }
@@ -1276,22 +1382,51 @@ setInterval(()=>revisarSnoozes(), 30e3);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) revisarSnoozes(); });
 
 /* ── Responder / redactar con IA (simulado) ──────────────────────────────── */
+function nombreFirma(){ return (datosCuenta().nombre||'').split(' ')[0] || 'Rodolfo'; }
+function borradorLocal(instr){
+  const saludo = ((emailActual && emailActual.de) || '').split(' ')[0];
+  const drafts = [
+    `Hola${saludo?' '+saludo:''},\n\nGracias por tu mensaje. ${capitalizar(instr)}.\n\nQuedo a tu disposición para cualquier detalle adicional.\n\nUn saludo,\n${nombreFirma()}`,
+    `Buenos días${saludo?' '+saludo:''},\n\n${capitalizar(instr)}. ¿Te parece bien así?\n\nUn cordial saludo,\n${nombreFirma()}`,
+    `Hola${saludo?' '+saludo:''},\n\nRecibido. ${capitalizar(instr)}.\n\nAvísame si necesitas algo más.\n\nSaludos,\n${nombreFirma()}`,
+  ];
+  return drafts[Math.floor(Math.random()*drafts.length)];
+}
+function mostrarBorrador(texto, btn){
+  document.getElementById('draft-body').value = texto;
+  document.getElementById('draft-area').style.display='block';
+  btn.textContent='Generar borrador'; btn.disabled=false;
+}
 function generarBorrador(){
   const instr = document.getElementById('reply-instr').value.trim();
   if(!instr){ toast_show('Escribe una instrucción primero.'); return; }
   const btn = document.getElementById('btn-draft');
   btn.textContent='Generando…'; btn.disabled=true;
-  setTimeout(() => {
-    const saludo = ((emailActual && emailActual.de) || '').split(' ')[0];
-    const drafts = [
-      `Hola${saludo?' '+saludo:''},\n\nGracias por tu mensaje. ${capitalizar(instr)}.\n\nQuedo a tu disposición para cualquier detalle adicional.\n\nUn saludo,\nRodolfo`,
-      `Buenos días${saludo?' '+saludo:''},\n\n${capitalizar(instr)}. ¿Te parece bien así?\n\nUn cordial saludo,\nRodolfo`,
-      `Hola${saludo?' '+saludo:''},\n\nRecibido. ${capitalizar(instr)}.\n\nAvísame si necesitas algo más.\n\nSaludos,\nRodolfo`,
-    ];
-    document.getElementById('draft-body').value = drafts[Math.floor(Math.random()*drafts.length)];
-    document.getElementById('draft-area').style.display='block';
-    btn.textContent='Generar borrador'; btn.disabled=false;
-  }, 700);
+  if(CONN.groqKey && emailActual){
+    groqChat([
+      {role:'system', content:'Eres SinMail IA. Redacta en español una respuesta cortés y profesional al correo recibido, siguiendo la instrucción del usuario. Mantén el tono del original. Máximo 100 palabras. Devuelve solo el cuerpo del correo, sin asunto ni comentarios. Firma como '+nombreFirma()+'.'},
+      {role:'user', content:'Instrucción: '+instr+'\n\nCorreo original de '+emailActual.de+' ('+emailActual.asunto+'):\n'+(emailActual.cuerpo||'').slice(0,1500)}
+    ], 320)
+      .then(t => mostrarBorrador(t || borradorLocal(instr), btn))
+      .catch(() => { toast_show('IA no disponible; borrador local.'); mostrarBorrador(borradorLocal(instr), btn); });
+  } else {
+    setTimeout(() => mostrarBorrador(borradorLocal(instr), btn), 700);
+  }
+}
+function resumirConIA(){
+  if(!emailActual || !CONN.groqKey) return;
+  const btn = document.getElementById('btn-resumir');
+  btn.textContent='Resumiendo…'; btn.disabled=true;
+  const e = emailActual;
+  groqChat([
+    {role:'system', content:'Eres SinMail IA. Resume el correo en una sola frase en español de máximo 15 palabras: qué necesita el remitente y qué acción se requiere. Sin lenguaje corporativo. Si no hay acción clara responde exactamente: Información sin acción requerida.'},
+    {role:'user', content:'Asunto: '+e.asunto+'\n\n'+(e.cuerpo||'').slice(0,2000)}
+  ], 60)
+    .then(t => {
+      if(t){ e.resumen = t; guardar(); if(emailActual===e) document.getElementById('r-resumen').textContent = t; }
+      btn.textContent='Resumir'; btn.disabled=false;
+    })
+    .catch(err => { toast_show('IA no disponible: '+err.message); btn.textContent='Resumir'; btn.disabled=false; });
 }
 function enviarRespuesta(){
   if(emailActual){ emailActual.cat='archivo'; emailActual.leido=true; guardar(); }
@@ -1307,13 +1442,24 @@ function enviarCorreo(){
 }
 function redactarConIA(){
   const instr = document.getElementById('c-instr').value.trim();
+  const asunto = document.getElementById('c-subject').value.trim();
   const body = document.getElementById('c-body');
-  toast_show('Redactando con IA…');
-  setTimeout(() => {
+  const local = () => {
     body.value = instr
-      ? `Hola,\n\n${capitalizar(instr)}.\n\nQuedo atento a tu respuesta.\n\nUn saludo,\nRodolfo`
-      : `Hola,\n\nTe escribo para…\n\nUn saludo,\nRodolfo`;
-  }, 600);
+      ? `Hola,\n\n${capitalizar(instr)}.\n\nQuedo atento a tu respuesta.\n\nUn saludo,\n${nombreFirma()}`
+      : `Hola,\n\nTe escribo para…\n\nUn saludo,\n${nombreFirma()}`;
+  };
+  toast_show('Redactando con IA…');
+  if(CONN.groqKey && instr){
+    groqChat([
+      {role:'system', content:'Eres SinMail IA. Redacta en español un correo claro y cortés según la instrucción. Máximo 120 palabras. Devuelve solo el cuerpo, sin asunto. Firma como '+nombreFirma()+'.'},
+      {role:'user', content:'Instrucción: '+instr+(asunto?'\nAsunto previsto: '+asunto:'')}
+    ], 350)
+      .then(t => { body.value = t || ''; if(!t) local(); })
+      .catch(() => { toast_show('IA no disponible; borrador local.'); local(); });
+  } else {
+    setTimeout(local, 600);
+  }
 }
 
 /* ── Reglas ──────────────────────────────────────────────────────────────── */
@@ -1417,6 +1563,7 @@ window.addEventListener('online', ()=>{ document.getElementById('sync-status').t
 window.addEventListener('offline', ()=>{ document.getElementById('sync-status').textContent='Sin conexión'; toast_show('Sin conexión. Tus cambios se conservan.'); });
 
 /* ── Inicializar ─────────────────────────────────────────────────────────── */
+cargarConexiones();
 cargar();
 revisarSnoozes();
 aplicarCuenta();
