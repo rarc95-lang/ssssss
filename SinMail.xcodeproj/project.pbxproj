@@ -10,8 +10,26 @@
 		5100000000000000000000A1 /* SinMail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SinMail.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5100000000000000000000B1 /* Exceptions for "SinMail" folder in "SinMail" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				SinMail.entitlements,
+			);
+			target = 5100000000000000000000A6 /* SinMail */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		5100000000000000000000A2 /* SinMail */ = {isa = PBXFileSystemSynchronizedRootGroup; path = SinMail; sourceTree = "<group>"; };
+		5100000000000000000000A2 /* SinMail */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5100000000000000000000B1 /* Exceptions for "SinMail" folder in "SinMail" target */,
+			);
+			path = SinMail;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
