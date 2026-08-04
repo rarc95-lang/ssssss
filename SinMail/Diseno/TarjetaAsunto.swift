@@ -16,15 +16,14 @@ struct TarjetaAsunto: View {
             if !asunto.acciones.isEmpty {
                 Divisor()
                 pie
-                    .padding(.vertical, Tokens.Metrica.padVertical)
+                    // El alto lo pone el área tocable de cada acción, no el
+                    // relleno: así el pie mide lo mismo y el dedo acierta.
+                    .padding(.vertical, (Tokens.Metrica.padVertical - Tokens.Metrica.interlinea) / 2)
                     .padding(.horizontal, Tokens.Metrica.padHorizontal)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
-                .fill(Tokens.Color.tarjeta)
-        )
+        .superficieTarjeta()
         // Sin sombras.
         .animation(Tokens.Movimiento.fundido, value: asunto.estado)
         .animation(Tokens.Movimiento.fundido, value: asunto.situacion)
@@ -46,10 +45,12 @@ struct TarjetaAsunto: View {
                 .foregroundColor(Tokens.Color.texto)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Falta: \(asunto.falta)")
-                .font(Tokens.Tipo.meta)
-                .foregroundColor(Tokens.Color.secundario)
-                .fixedSize(horizontal: false, vertical: true)
+            if asunto.muestraFalta {
+                Text("Falta: \(asunto.falta)")
+                    .font(Tokens.Tipo.meta)
+                    .foregroundColor(Tokens.Color.secundario)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -63,6 +64,7 @@ struct TarjetaAsunto: View {
                     Text(accion.titulo)
                         .font(accion.esPrimaria ? Tokens.Tipo.accion : Tokens.Tipo.accionSecundaria)
                         .foregroundColor(accion.esPrimaria ? asunto.estado.color : Tokens.Color.secundario)
+                        .areaTocable()
                 }
                 .buttonStyle(.plain)
             }

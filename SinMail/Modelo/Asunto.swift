@@ -90,6 +90,12 @@ struct Asunto: Identifiable, Codable, Equatable, Sendable {
         (hilos.sorted().joined(separator: "|") + "#" + cuentaID)
     }
 
+    /// La línea "Falta: …" sólo aparece cuando falta algo de verdad. En LEER no
+    /// hay nada pendiente por definición, y en CERRADO ya no queda nada.
+    var muestraFalta: Bool {
+        (estado == .tuyo || estado == .esperando) && !falta.isEmpty
+    }
+
     /// TUYO muestra tres acciones, ESPERANDO dos, LEER y CERRADO ninguna.
     var acciones: [AccionTarjeta] {
         switch estado {

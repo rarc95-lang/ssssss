@@ -108,10 +108,7 @@ struct BandejaView: View {
         .padding(.vertical, Tokens.Metrica.padVertical)
         .padding(.horizontal, Tokens.Metrica.padHorizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
-                .fill(Tokens.Color.tarjeta)
-        )
+        .superficieTarjeta()
     }
 
     // MARK: - Acciones

@@ -43,6 +43,7 @@ struct HiloView: View {
                     Text("Volver")
                         .font(Tokens.Tipo.accionSecundaria)
                         .foregroundColor(Tokens.Color.secundario)
+                        .areaTocable()
                 }
                 .buttonStyle(.plain)
                 Spacer(minLength: 0)
@@ -77,10 +78,7 @@ struct HiloView: View {
         .padding(.vertical, Tokens.Metrica.padVertical)
         .padding(.horizontal, Tokens.Metrica.padHorizontal)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
-                .fill(Tokens.Color.tarjeta)
-        )
+        .superficieTarjeta()
     }
 
     /// Resalta la cita literal dentro del mensaje del que salió.
@@ -99,7 +97,7 @@ struct HiloView: View {
         return Text(antes)
             + Text(fragmento)
                 .foregroundColor(asunto.estado.color)
-                .font(.system(size: 15, weight: .medium))
+                .font(Tokens.Tipo.citaResaltada)
             + Text(despues)
     }
 

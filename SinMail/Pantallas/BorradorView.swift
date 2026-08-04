@@ -34,10 +34,7 @@ struct BorradorView: View {
                     .focused($escribiendo)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
-                            .fill(Tokens.Color.tarjeta)
-                    )
+                    .superficieTarjeta()
 
                 if let fallo {
                     Text(fallo)
@@ -67,6 +64,7 @@ struct BorradorView: View {
                     Text("Volver")
                         .font(Tokens.Tipo.accionSecundaria)
                         .foregroundColor(Tokens.Color.secundario)
+                        .areaTocable()
                 }
                 .buttonStyle(.plain)
 
@@ -78,6 +76,7 @@ struct BorradorView: View {
                     Text(asunto.accion)
                         .font(Tokens.Tipo.accion)
                         .foregroundColor(Tokens.Color.tuyoTexto)
+                        .areaTocable()
                 }
                 .buttonStyle(.plain)
                 .disabled(texto.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)

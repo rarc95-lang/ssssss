@@ -47,6 +47,7 @@ struct AltaCuentaView: View {
                 Text("Listo")
                     .font(Tokens.Tipo.accion)
                     .foregroundColor(Tokens.Color.tuyoTexto)
+                    .areaTocable()
             }
             .buttonStyle(.plain)
         }
@@ -178,10 +179,7 @@ struct AltaCuentaView: View {
             .padding(.vertical, Tokens.Metrica.padVertical)
             .padding(.horizontal, Tokens.Metrica.padHorizontal)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
-                    .fill(Tokens.Color.tarjeta)
-            )
+            .superficieTarjeta()
     }
 
     private func conectar() {

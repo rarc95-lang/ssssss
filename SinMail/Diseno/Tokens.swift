@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Sistema de diseño de SinMail.
 ///
@@ -32,15 +33,32 @@ enum Tokens {
     // MARK: - Tipografía
     //
     // SF Pro, únicamente pesos 400 (regular) y 500 (medium). Nunca mayúsculas.
+    //
+    // Los tamaños son los del diseño en el ajuste por defecto del sistema, y
+    // escalan con el cuerpo de letra que haya elegido el usuario. Un tamaño fijo
+    // se leería igual en la maqueta y mal en el teléfono de quien lo necesita.
 
     enum Tipo {
-        static let titulo = Font.system(size: 17, weight: .medium)
-        static let situacion = Font.system(size: 15, weight: .regular)
-        static let meta = Font.system(size: 13, weight: .regular)
-        static let chip = Font.system(size: 12, weight: .medium)
-        static let accion = Font.system(size: 15, weight: .medium)
-        static let accionSecundaria = Font.system(size: 15, weight: .regular)
-        static let encabezado = Font.system(size: 24, weight: .medium)
+        static var titulo: Font { escalada(17, .medium) }
+        static var situacion: Font { escalada(15, .regular) }
+        static var meta: Font { escalada(13, .regular) }
+        static var chip: Font { escalada(12, .medium, relativoA: .caption1) }
+        static var accion: Font { escalada(15, .medium) }
+        static var accionSecundaria: Font { escalada(15, .regular) }
+        static var encabezado: Font { escalada(24, .medium, relativoA: .title2) }
+        /// La cita literal, resaltada dentro del hilo.
+        static var citaResaltada: Font { escalada(15, .medium) }
+
+        private static func escalada(
+            _ tamano: CGFloat,
+            _ peso: Font.Weight,
+            relativoA estilo: UIFont.TextStyle = .body
+        ) -> Font {
+            Font.system(
+                size: UIFontMetrics(forTextStyle: estilo).scaledValue(for: tamano),
+                weight: peso
+            )
+        }
     }
 
     // MARK: - Métrica
@@ -57,6 +75,9 @@ enum Tokens {
         static let interlinea: CGFloat = 6
         static let padChipVertical: CGFloat = 4
         static let padChipHorizontal: CGFloat = 8
+        /// Área mínima que se puede tocar con el dedo. Las acciones son sólo
+        /// texto, así que el área crece sin que se vea nada.
+        static let tocable: CGFloat = 44
     }
 
     // MARK: - Movimiento
@@ -86,5 +107,32 @@ struct Divisor: View {
         Rectangle()
             .fill(Tokens.Color.hairline)
             .frame(height: Tokens.Metrica.hairline)
+    }
+}
+
+/// La superficie de una tarjeta: blanco sobre la página, radio 18 y un borde de
+/// un cabello.
+///
+/// El borde no es decoración. Sin sombras, `#FFFFFF` sobre `#FAFAF8` es un
+/// contraste tan bajo que el canto de la tarjeta desaparece; el hairline es lo
+/// único que dice dónde termina.
+struct SuperficieTarjeta: ViewModifier {
+    func body(content: Content) -> some View {
+        let forma = RoundedRectangle(cornerRadius: Tokens.Metrica.radioTarjeta, style: .continuous)
+        return content
+            .background(forma.fill(Tokens.Color.tarjeta))
+            .overlay(forma.strokeBorder(Tokens.Color.hairline, lineWidth: Tokens.Metrica.hairline))
+    }
+}
+
+extension View {
+    func superficieTarjeta() -> some View {
+        modifier(SuperficieTarjeta())
+    }
+
+    /// Agranda el área tocable sin dibujar nada.
+    func areaTocable() -> some View {
+        frame(minHeight: Tokens.Metrica.tocable)
+            .contentShape(Rectangle())
     }
 }
