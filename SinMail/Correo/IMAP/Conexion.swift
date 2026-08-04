@@ -79,10 +79,11 @@ final class Socket: @unchecked Sendable {
 
     /// Ajusta cuánto espera una lectura antes de rendirse.
     func fijarPlazoDeLectura(_ segundos: TimeInterval) {
-        // La constante llega de CoreFoundation como opcional, así que se
-        // desenvuelve antes de convertirla en clave de `Stream`.
-        guard let claveCF = kCFStreamPropertySocketNativeHandle else { return }
-        let clave = Stream.PropertyKey(rawValue: claveCF.rawValue as String)
+        // El descriptor del socket se pide por la clave de CoreFoundation, ya
+        // convertida a la que entiende `Stream`.
+        let clave = Stream.PropertyKey(
+            rawValue: CFStreamPropertyKey.socketNativeHandle.rawValue as String
+        )
 
         guard let datos = entrada.property(forKey: clave) as? Data,
               datos.count >= MemoryLayout<CFSocketNativeHandle>.size else { return }
