@@ -1,0 +1,52 @@
+name: Compilar SinMail
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'SinMail/**'
+      - 'SinMail.xcodeproj/**'
+      - '.github/workflows/compilar.yml'
+  pull_request:
+    paths:
+      - 'SinMail/**'
+      - 'SinMail.xcodeproj/**'
+      - '.github/workflows/compilar.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: compilar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    name: Compilar para el simulador
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode disponible
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i simulator || true
+
+      # Se compila contra el simulador y sin firmar: aquí sólo interesa saber si
+      # el código compila. Firmar exigiría el certificado del equipo y el
+      # contenedor de iCloud, que no viven en un runner público.
+      - name: Compilar
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project SinMail.xcodeproj \
+            -scheme SinMail \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            ONLY_ACTIVE_ARCH=NO

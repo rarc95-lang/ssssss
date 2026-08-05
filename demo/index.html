@@ -1,0 +1,641 @@
+<title>SinMail — las tres pantallas</title>
+
+<style>
+  :root {
+    /* Página que rodea al teléfono. No es la app: es el escaparate. */
+    --tinta: #101317;
+    --tinta-alta: #171B21;
+    --filete: rgba(255, 255, 255, .09);
+    --texto: #E8E9EC;
+    --apagado: #8B9099;
+    --acento: #6C93F5;
+
+    /* Tokens de SinMail. Estos no se tocan: vienen de Tokens.swift. */
+    --pagina: #FAFAF8;
+    --tarjeta: #FFFFFF;
+    --app-texto: #1C1C1E;
+    --app-secundario: #8A8A8E;
+    --hairline: rgba(0, 0, 0, .06);
+
+    --tuyo-fondo: #E7EEFC;      --tuyo-texto: #1D4ED8;
+    --esperando-fondo: #F7EFE5; --esperando-texto: #96794F;
+    --leer-fondo: #F0F0ED;      --leer-texto: #71716B;
+    --cerrado-fondo: #E9F1E9;   --cerrado-texto: #5B7A5B;
+
+    --radio-tarjeta: 18px;
+    --radio-chip: 8px;
+    --pad-v: 16px;
+    --pad-h: 20px;
+    --separacion: 12px;
+
+    --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --tinta: #ECEDEF;
+      --tinta-alta: #FFFFFF;
+      --filete: rgba(0, 0, 0, .10);
+      --texto: #14171C;
+      --apagado: #61666E;
+      --acento: #1D4ED8;
+    }
+  }
+  :root[data-theme="light"] {
+    --tinta: #ECEDEF;
+    --tinta-alta: #FFFFFF;
+    --filete: rgba(0, 0, 0, .10);
+    --texto: #14171C;
+    --apagado: #61666E;
+    --acento: #1D4ED8;
+  }
+  :root[data-theme="dark"] {
+    --tinta: #101317;
+    --tinta-alta: #171B21;
+    --filete: rgba(255, 255, 255, .09);
+    --texto: #E8E9EC;
+    --apagado: #8B9099;
+    --acento: #6C93F5;
+  }
+
+  body {
+    margin: 0;
+    background: var(--tinta);
+    color: var(--texto);
+    font-family: var(--sf);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .envoltorio {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  /* ---------- Encabezado ---------- */
+
+  .presentacion { display: flex; flex-direction: column; gap: 14px; max-width: 62ch; }
+
+  .marca {
+    font-size: clamp(38px, 6vw, 56px);
+    font-weight: 500;
+    letter-spacing: -.03em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .marca .sin { color: var(--acento); }
+
+  .tesis { font-size: 19px; margin: 0; color: var(--texto); text-wrap: balance; }
+  .matiz { font-size: 15px; margin: 0; color: var(--apagado); }
+
+  .ficha {
+    display: flex; flex-wrap: wrap; gap: 8px 20px;
+    font-family: var(--mono); font-size: 12px; color: var(--apagado);
+    padding-top: 6px;
+  }
+
+  /* ---------- Fila de teléfonos ---------- */
+
+  .escenario {
+    display: flex; flex-wrap: wrap; gap: 48px 40px;
+    justify-content: center;
+  }
+
+  .caso { display: flex; flex-direction: column; gap: 18px; width: 320px; }
+
+  .rotulo { display: flex; flex-direction: column; gap: 5px; }
+  .rotulo b { font-size: 17px; font-weight: 500; }
+  .rotulo span { font-size: 14px; color: var(--apagado); }
+  .rotulo .num {
+    font-family: var(--mono); font-size: 11px; color: var(--acento);
+    letter-spacing: .08em;
+  }
+
+  /* Marco del teléfono: bisel fino, sin brillos. */
+  .telefono {
+    width: 320px; height: 664px;
+    border-radius: 46px;
+    padding: 9px;
+    background: linear-gradient(160deg, #2A2F37, #14171B);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, .38), 0 0 0 1px rgba(255, 255, 255, .06) inset;
+    flex: none;
+  }
+  @media (prefers-color-scheme: light) {
+    .telefono { box-shadow: 0 18px 40px rgba(16, 19, 23, .22); }
+  }
+
+  .pantalla {
+    position: relative;
+    height: 100%;
+    border-radius: 38px;
+    overflow: hidden;
+    background: var(--pagina);
+    color: var(--app-texto);
+    display: flex; flex-direction: column;
+  }
+
+  .isla {
+    position: absolute; top: 9px; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 27px; border-radius: 14px; background: #0B0C0E; z-index: 3;
+  }
+
+  .estado-ios {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 22px 0;
+    font-size: 13px; font-weight: 500; color: var(--app-texto);
+    flex: none;
+  }
+  .estado-ios .senal { display: flex; gap: 5px; align-items: center; opacity: .85; }
+  .barra { width: 3px; border-radius: 1px; background: currentColor; }
+
+  .lienzo {
+    flex: 1; overflow-y: auto; overscroll-behavior: contain;
+    padding: 0 16px 28px;
+    display: flex; flex-direction: column; gap: var(--separacion);
+  }
+  .lienzo::-webkit-scrollbar { width: 0; }
+
+  /* ---------- Encabezado de la bandeja ---------- */
+
+  .cabecera-app { padding: 20px 0 8px; display: flex; flex-direction: column; gap: 4px; }
+  .cabecera-fila { display: flex; align-items: baseline; justify-content: space-between; }
+  .logotipo { font-size: 24px; font-weight: 500; letter-spacing: -.02em; }
+  .logotipo .sin { color: var(--tuyo-texto); }
+  .logotipo .mail { color: var(--app-texto); }
+  .enlace-cuentas { font-size: 13px; color: var(--app-secundario); }
+  .linea-una { font-size: 13px; color: var(--app-secundario); }
+
+  /* ---------- Tarjeta ---------- */
+
+  .tarjeta {
+    background: var(--tarjeta);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radio-tarjeta);
+    /* Sin sombras: el filete es lo único que marca el canto. */
+  }
+  .cuerpo { padding: var(--pad-v) var(--pad-h); display: flex; flex-direction: column; gap: 6px; }
+
+  .chip {
+    align-self: flex-start;
+    font-size: 12px; font-weight: 500;
+    padding: 4px 8px; border-radius: var(--radio-chip);
+    margin-bottom: 2px;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  .chip.tuyo      { background: var(--tuyo-fondo);      color: var(--tuyo-texto); }
+  .chip.esperando { background: var(--esperando-fondo); color: var(--esperando-texto); }
+  .chip.leer      { background: var(--leer-fondo);      color: var(--leer-texto); }
+  .chip.cerrado   { background: var(--cerrado-fondo);   color: var(--cerrado-texto); }
+
+  .titulo { font-size: 17px; font-weight: 500; }
+  .situacion { font-size: 15px; }
+  .falta { font-size: 13px; color: var(--app-secundario); }
+
+  .divisor { height: 1px; background: var(--hairline); }
+
+  .pie {
+    display: flex; gap: 20px; align-items: center;
+    padding: 4px var(--pad-h);
+  }
+  /* Sólo texto, diferenciadas por color, nunca con fondo. */
+  .accion {
+    background: none; border: 0; padding: 0;
+    min-height: 44px;
+    font-family: inherit; font-size: 15px; cursor: pointer;
+  }
+  .accion.primaria { font-weight: 500; }
+  .accion.secundaria { font-weight: 400; color: var(--app-secundario); }
+  .accion.tuyo { color: var(--tuyo-texto); }
+  .accion.esperando { color: var(--esperando-texto); }
+  .accion:focus-visible { outline: 2px solid var(--tuyo-texto); outline-offset: 3px; border-radius: 4px; }
+
+  /* ---------- Borrador ---------- */
+
+  .barra-hoja {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 0 0;
+  }
+  .barra-hoja .accion { min-height: 32px; }
+  .destinatario { font-size: 13px; color: var(--app-secundario); }
+
+  .editor {
+    background: var(--tarjeta);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radio-tarjeta);
+    padding: 12px 14px;
+    font-size: 15px;
+    white-space: pre-wrap;
+    flex: 1;
+    min-height: 260px;
+  }
+  .cursor {
+    display: inline-block; width: 2px; height: 1.05em;
+    background: var(--tuyo-texto); vertical-align: text-bottom;
+    animation: latir 1.06s steps(1, end) infinite;
+  }
+  @keyframes latir { 0%, 50% { opacity: 1 } 50.01%, 100% { opacity: 0 } }
+
+  /* ---------- Hilo ---------- */
+
+  .mensaje { padding: var(--pad-v) var(--pad-h); display: flex; flex-direction: column; gap: 6px; }
+  .quien { display: flex; align-items: baseline; justify-content: space-between; }
+  .quien b { font-size: 17px; font-weight: 500; }
+  .quien span { font-size: 13px; color: var(--app-secundario); }
+  .texto-mensaje { font-size: 15px; white-space: pre-wrap; }
+  /* La cita literal que sostiene el estado. */
+  .cita { color: var(--tuyo-texto); font-weight: 500; }
+
+  /* ---------- Leyenda ---------- */
+
+  .leyenda { display: flex; flex-direction: column; gap: 28px; }
+  .leyenda h2 {
+    font-size: 13px; font-weight: 500; margin: 0;
+    font-family: var(--mono); letter-spacing: .1em; color: var(--apagado);
+  }
+
+  .rejilla {
+    display: grid; gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+    background: var(--filete);
+    border: 1px solid var(--filete);
+    border-radius: 14px; overflow: hidden;
+  }
+  .celda { background: var(--tinta-alta); padding: 20px; display: flex; flex-direction: column; gap: 9px; }
+  .celda .nombre { font-size: 15px; font-weight: 500; }
+  .celda .regla { font-size: 14px; color: var(--apagado); }
+  .celda .hex {
+    font-family: var(--mono); font-size: 11.5px; color: var(--apagado);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .muestra { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+  .escala { display: flex; flex-direction: column; }
+  .fila-escala {
+    display: flex; align-items: baseline; gap: 20px;
+    padding: 13px 0; border-bottom: 1px solid var(--filete);
+  }
+  .fila-escala:last-child { border-bottom: 0; }
+  .fila-escala code {
+    font-family: var(--mono); font-size: 11.5px; color: var(--apagado);
+    min-width: 108px; flex: none;
+  }
+  .fila-escala .prueba { color: var(--texto); }
+
+  /* Demostración del cambio de estado. La tarjeta no viaja: sólo funde. */
+  .fundido { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+  .fundido .tarjeta { background: var(--tinta-alta); border-color: var(--filete); }
+  .fundido .titulo, .fundido .situacion { color: var(--texto); }
+  .fundido .falta { color: var(--apagado); }
+  .fundido .divisor { background: var(--filete); }
+  .fundido .nota { font-size: 13px; color: var(--apagado); font-family: var(--mono); }
+  .desvanece { transition: opacity .25s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor { animation: none; }
+    .chip, .desvanece { transition: none; }
+  }
+
+  @media (max-width: 720px) {
+    .envoltorio { padding: 40px 16px 64px; gap: 48px; }
+    .escenario { gap: 44px 24px; }
+  }
+</style>
+
+<div class="envoltorio">
+
+  <header class="presentacion">
+    <h1 class="marca"><span class="sin">Sin</span>Mail</h1>
+    <p class="tesis">Un cliente de correo que no muestra mensajes, sino asuntos con estado.</p>
+    <p class="matiz">
+      La unidad es la cosa pendiente real —&nbsp;«cotización camilla»&nbsp;—, que puede abarcar
+      varios hilos y varias personas. Al llegar correo nuevo no aparece una fila: cambia el
+      estado de una tarjeta que ya estaba ahí.
+    </p>
+    <div class="ficha">
+      <span>iOS 17 · SwiftUI</span>
+      <span>IMAP y SMTP desde el dispositivo</span>
+      <span>CloudKit privado</span>
+      <span>sin servidor propio</span>
+    </div>
+  </header>
+
+  <section class="escenario">
+
+    <!-- ============ 1. Bandeja ============ -->
+    <article class="caso">
+      <div class="rotulo">
+        <span class="num">01 · bandeja</span>
+        <b>Agrupada por estado</b>
+        <span>Tuyo, esperando, leer, cerrado. Encabezado con una línea y ningún contador de no leídos.</span>
+      </div>
+
+      <div class="telefono">
+        <div class="pantalla">
+          <div class="isla"></div>
+          <div class="estado-ios">
+            <span>9:41</span>
+            <span class="senal">
+              <span class="barra" style="height:5px"></span>
+              <span class="barra" style="height:7px"></span>
+              <span class="barra" style="height:9px"></span>
+              <span class="barra" style="height:11px"></span>
+            </span>
+          </div>
+
+          <div class="lienzo">
+            <div class="cabecera-app">
+              <div class="cabecera-fila">
+                <span class="logotipo"><span class="sin">Sin</span><span class="mail">Mail</span></span>
+                <span class="enlace-cuentas">Cuentas</span>
+              </div>
+              <span class="linea-una">2 asuntos tuyos</span>
+            </div>
+
+            <div class="tarjeta">
+              <div class="cuerpo">
+                <span class="chip tuyo">Tuyo</span>
+                <span class="titulo">Cotización camilla</span>
+                <span class="situacion">La clínica espera el número de serie.</span>
+                <span class="falta">Falta: El número de serie del equipo</span>
+              </div>
+              <div class="divisor"></div>
+              <div class="pie">
+                <button class="accion primaria tuyo">Enviar el número</button>
+                <button class="accion secundaria">Ver hilo</button>
+                <button class="accion secundaria">Cerrar</button>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="cuerpo">
+                <span class="chip tuyo">Tuyo</span>
+                <span class="titulo">Contrato de mantenimiento</span>
+                <span class="situacion">Falta tu firma para renovar.</span>
+                <span class="falta">Falta: Tu firma en el anexo</span>
+              </div>
+              <div class="divisor"></div>
+              <div class="pie">
+                <button class="accion primaria tuyo">Firmar el anexo</button>
+                <button class="accion secundaria">Ver hilo</button>
+                <button class="accion secundaria">Cerrar</button>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="cuerpo">
+                <span class="chip esperando">Esperando</span>
+                <span class="titulo">Certificado de afiliación</span>
+                <span class="situacion">Solicitado a la aseguradora el martes.</span>
+                <span class="falta">Falta: Su respuesta</span>
+              </div>
+              <div class="divisor"></div>
+              <div class="pie">
+                <button class="accion primaria esperando">Recordar</button>
+                <button class="accion secundaria">Ver hilo</button>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="cuerpo">
+                <span class="chip leer">Leer</span>
+                <span class="titulo">Reunión de coordinación</span>
+                <span class="situacion">Camila propuso un horario nuevo.</span>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="cuerpo">
+                <span class="chip cerrado">Cerrado</span>
+                <span class="titulo">Factura de marzo</span>
+                <span class="situacion">Pagada y confirmada por contabilidad.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ 2. Borrador ============ -->
+    <article class="caso">
+      <div class="rotulo">
+        <span class="num">02 · borrador</span>
+        <b>Ya escrito, el cursor dentro</b>
+        <span>Se abre desde la acción primaria. Sin pantalla intermedia y sin spinner; se envía en un segundo toque.</span>
+      </div>
+
+      <div class="telefono">
+        <div class="pantalla">
+          <div class="isla"></div>
+          <div class="estado-ios">
+            <span>9:41</span>
+            <span class="senal">
+              <span class="barra" style="height:5px"></span>
+              <span class="barra" style="height:7px"></span>
+              <span class="barra" style="height:9px"></span>
+              <span class="barra" style="height:11px"></span>
+            </span>
+          </div>
+
+          <div class="lienzo">
+            <div class="barra-hoja">
+              <button class="accion secundaria">Volver</button>
+              <button class="accion primaria tuyo">Enviar el número</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px; padding-top:2px">
+              <span class="titulo">Cotización camilla</span>
+              <span class="destinatario">Para: marcela.rojas@clinicasanjose.cl</span>
+            </div>
+
+            <div class="editor">Hola Marcela,
+
+Aquí va el número de serie: <span class="cursor"></span>
+
+Un saludo,
+Raúl</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ 3. Hilo ============ -->
+    <article class="caso">
+      <div class="rotulo">
+        <span class="num">03 · hilo</span>
+        <b>Sólo lectura, con la cita resaltada</b>
+        <span>Queda a un toque, pero no es la interfaz. La frase marcada es la que justifica el estado, copiada literal.</span>
+      </div>
+
+      <div class="telefono">
+        <div class="pantalla">
+          <div class="isla"></div>
+          <div class="estado-ios">
+            <span>9:41</span>
+            <span class="senal">
+              <span class="barra" style="height:5px"></span>
+              <span class="barra" style="height:7px"></span>
+              <span class="barra" style="height:9px"></span>
+              <span class="barra" style="height:11px"></span>
+            </span>
+          </div>
+
+          <div class="lienzo">
+            <div class="barra-hoja">
+              <button class="accion secundaria">Volver</button>
+            </div>
+            <span class="titulo" style="padding-bottom:2px">Cotización camilla</span>
+
+            <div class="tarjeta">
+              <div class="mensaje">
+                <div class="quien"><b>Raúl</b><span>12 mar, 10:04</span></div>
+                <span class="texto-mensaje">Marcela, te paso la cotización de la camilla clínica que pediste. Quedo atento a cualquier duda.</span>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="mensaje">
+                <div class="quien"><b>Marcela Rojas</b><span>12 mar, 16:22</span></div>
+                <span class="texto-mensaje">Gracias, todo bien con el precio. <span class="cita">Necesitamos el número de serie del equipo para poder emitir la orden de compra.</span></span>
+              </div>
+            </div>
+
+            <div class="tarjeta">
+              <div class="mensaje">
+                <div class="quien"><b>Marcela Rojas</b><span>14 mar, 09:10</span></div>
+                <span class="texto-mensaje">Hola Raúl, ¿alcanzaste a ver lo del número de serie? Nos lo piden hoy para cerrar el mes.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ============ Leyenda ============ -->
+  <section class="leyenda">
+    <h2>LOS CUATRO ESTADOS</h2>
+    <div class="rejilla">
+      <div class="celda">
+        <span class="chip tuyo">Tuyo</span>
+        <span class="nombre">La pelota es tuya</span>
+        <span class="regla">La siguiente acción depende de ti. Tres acciones: la primaria, ver hilo y cerrar.</span>
+        <span class="hex"><span class="muestra" style="background:#E7EEFC"></span>#E7EEFC<span class="muestra" style="background:#1D4ED8"></span>#1D4ED8</span>
+      </div>
+      <div class="celda">
+        <span class="chip esperando">Esperando</span>
+        <span class="nombre">La pelota es de otro</span>
+        <span class="regla">Depende de otra persona. Dos acciones: recordar y ver hilo.</span>
+        <span class="hex"><span class="muestra" style="background:#F7EFE5"></span>#F7EFE5<span class="muestra" style="background:#96794F"></span>#96794F</span>
+      </div>
+      <div class="celda">
+        <span class="chip leer">Leer</span>
+        <span class="nombre">Nada que hacer</span>
+        <span class="regla">Información sin acción. Sin acciones y sin línea de falta: no falta nada.</span>
+        <span class="hex"><span class="muestra" style="background:#F0F0ED"></span>#F0F0ED<span class="muestra" style="background:#71716B"></span>#71716B</span>
+      </div>
+      <div class="celda">
+        <span class="chip cerrado">Cerrado</span>
+        <span class="nombre">Lo cierras tú</span>
+        <span class="regla">No queda nada pendiente. El sistema jamás lo asigna: el cierre lo confirma la persona.</span>
+        <span class="hex"><span class="muestra" style="background:#E9F1E9"></span>#E9F1E9<span class="muestra" style="background:#5B7A5B"></span>#5B7A5B</span>
+      </div>
+    </div>
+
+    <h2>ESCALA TIPOGRÁFICA — SÓLO PESOS 400 Y 500, NUNCA MAYÚSCULAS</h2>
+    <div class="escala">
+      <div class="fila-escala">
+        <code>titulo 17/500</code>
+        <span class="prueba" style="font-size:17px; font-weight:500">Cotización camilla</span>
+      </div>
+      <div class="fila-escala">
+        <code>situacion 15/400</code>
+        <span class="prueba" style="font-size:15px; font-weight:400">La clínica espera el número de serie.</span>
+      </div>
+      <div class="fila-escala">
+        <code>meta 13/400</code>
+        <span class="prueba" style="font-size:13px; font-weight:400; color:var(--apagado)">Falta: El número de serie del equipo</span>
+      </div>
+      <div class="fila-escala">
+        <code>chip 12/500</code>
+        <span class="chip tuyo" style="margin:0">Tuyo</span>
+      </div>
+    </div>
+
+    <h2>CAMBIO DE ESTADO — FUNDIDO DE 250 MS, LA TARJETA NO VIAJA</h2>
+    <div class="fundido">
+      <div class="tarjeta" id="demo-tarjeta">
+        <div class="cuerpo">
+          <span class="chip tuyo" id="demo-chip">Tuyo</span>
+          <span class="titulo">Cotización camilla</span>
+          <span class="situacion desvanece" id="demo-situacion">La clínica espera el número de serie.</span>
+          <span class="falta desvanece" id="demo-falta">Falta: El número de serie del equipo</span>
+        </div>
+        <div class="divisor"></div>
+        <div class="pie">
+          <button class="accion primaria tuyo desvanece" id="demo-primaria">Enviar el número</button>
+          <button class="accion secundaria">Ver hilo</button>
+          <button class="accion secundaria" id="demo-tercera">Cerrar</button>
+        </div>
+      </div>
+      <span class="nota">enviado → la pelota pasa a la otra parte, en el mismo sitio</span>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Demostración del cambio de estado: el contenido funde, la posición no se mueve.
+  (function () {
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducido.matches) return;
+
+    const chip = document.getElementById("demo-chip");
+    const situacion = document.getElementById("demo-situacion");
+    const falta = document.getElementById("demo-falta");
+    const primaria = document.getElementById("demo-primaria");
+    const tercera = document.getElementById("demo-tercera");
+
+    const estados = [
+      {
+        clase: "tuyo",
+        etiqueta: "Tuyo",
+        situacion: "La clínica espera el número de serie.",
+        falta: "Falta: El número de serie del equipo",
+        primaria: "Enviar el número",
+        tercera: "Cerrar"
+      },
+      {
+        clase: "esperando",
+        etiqueta: "Esperando",
+        situacion: "Enviado, a la espera de respuesta.",
+        falta: "Falta: Su respuesta",
+        primaria: "Recordar",
+        tercera: ""
+      }
+    ];
+
+    let i = 0;
+    setInterval(function () {
+      i = (i + 1) % estados.length;
+      const e = estados[i];
+
+      [situacion, falta, primaria].forEach(function (nodo) { nodo.style.opacity = "0"; });
+
+      setTimeout(function () {
+        chip.className = "chip " + e.clase;
+        chip.textContent = e.etiqueta;
+        situacion.textContent = e.situacion;
+        falta.textContent = e.falta;
+        primaria.textContent = e.primaria;
+        primaria.className = "accion primaria " + e.clase + " desvanece";
+        tercera.textContent = e.tercera;
+        tercera.style.display = e.tercera ? "" : "none";
+        [situacion, falta, primaria].forEach(function (nodo) { nodo.style.opacity = "1"; });
+      }, 250);
+    }, 3200);
+  })();
+</script>
