@@ -12,8 +12,8 @@ enum PromptEspanol {
     Ante la duda, un hilo es un asunto.
 
     Campos de cada asunto:
-    - titulo: la cosa pendiente, cinco palabras como máximo, en minúsculas salvo \
-    nombres propios.
+    - titulo: la cosa pendiente, cinco palabras como máximo, en minúscula salvo \
+    la inicial y los nombres propios.
     - estado: TUYO, ESPERANDO o LEER.
     - responsable: quién tiene la pelota ahora, por su nombre.
     - situacion: en qué punto está, diez palabras como máximo.
